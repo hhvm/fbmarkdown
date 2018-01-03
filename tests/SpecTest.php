@@ -23,12 +23,7 @@ final class SpecTest extends TestCase {
   const int EXAMPLE_COUNT = 649;
 
   public function getSpecExamples(): array<(string, string, string, ?string)> {
-    $spec_file_path = \getenv('GFM_SPEC_FILE');
-    if (!is_string($spec_file_path)) {
-      $this->markTestSkipped('need GFM_SPEC_FILE env var');
-    }
-
-    $text = \file_get_contents($spec_file_path);
+    $text = \file_get_contents(__DIR__.'/spec.txt');
     $raw_examples = vec[];
     $offset = 0;
     while (true) {
