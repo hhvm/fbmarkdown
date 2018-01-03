@@ -8,3 +8,9 @@ title: GitHub Flavored Markdown Spec
 version: 0.28
 date: '2017-08-01'
 license: '[CC-BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/)'
+
+-----
+
+The following software may be included in this product: HTML Standard. This Software contains the following license and notice below:
+
+Parts of this specification are © Copyright 2004-2014 Apple Inc., Mozilla Foundation, and Opera Software ASA. You are granted a license to use, reproduce and create derivative works of this document.

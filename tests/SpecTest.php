@@ -71,10 +71,6 @@ final class SpecTest extends TestCase {
     return $examples;
   }
 
-  const dict<string, string> BLACKLIST = dict[
-    'Example 312' => 'Out of date named entity table',
-  ];
-
   /** @dataProvider getSpecExamples */
   public function testSpecExample(
     string $name,
@@ -82,10 +78,6 @@ final class SpecTest extends TestCase {
     string $expected_html,
     ?string $extension,
   ): void {
-    $blacklist = self::BLACKLIST[$name] ?? null;
-    if ($blacklist !== null) {
-      $this->markTestSkipped($blacklist);
-    }
     $this->assertExampleMatches($name, $in, $expected_html, $extension);
   }
 }
