@@ -23,7 +23,7 @@ final class SpecTest extends TestCase {
   const int EXAMPLE_COUNT = 649;
 
   public function getSpecExamples(): array<(string, string, string, ?string)> {
-    $text = \file_get_contents(__DIR__.'/spec.txt');
+    $text = \file_get_contents(__DIR__.'/../third-party/spec.txt');
     $raw_examples = vec[];
     $offset = 0;
     while (true) {
