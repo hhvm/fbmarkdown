@@ -8,6 +8,7 @@ hhvm -d hhvm.jit=0 /usr/local/bin/composer install
 
 hh_server --check $(pwd)
 hhvm -d hhvm.jit=0 vendor/bin/phpunit
+hhvm -d hhvm.jit=0 vendor/bin/hhast-lint
 
 HHVM_VERSION=$(hhvm --php -r 'echo HHVM_VERSION_ID;' 2>/dev/null);
 if [ $HHVM_VERSION -ge 32002 ]; then

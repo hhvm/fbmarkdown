@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "24c45e5300cd4416aead5e0bbbf4b841",
+    "content-hash": "6253c00188755bffd88a868ab1c5f06c",
     "packages": [
         {
             "name": "facebook/definition-finder",
@@ -333,6 +333,39 @@
             "notification-url": "https://packagist.org/downloads/",
             "description": "Unit test helpers for Facebook projects",
             "time": "2017-09-20T18:27:43+00:00"
+        },
+        {
+            "name": "hhvm/hhast",
+            "version": "v0.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/hhvm/hhast.git",
+                "reference": "4405a33582d3700c18ab30d1202e994e084b0849"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/hhvm/hhast/zipball/4405a33582d3700c18ab30d1202e994e084b0849",
+                "reference": "4405a33582d3700c18ab30d1202e994e084b0849",
+                "shasum": ""
+            },
+            "require": {
+                "hhvm": "^3.21.0",
+                "hhvm/hsl": "^1.0.0",
+                "hhvm/type-assert": "^3.1"
+            },
+            "require-dev": {
+                "91carriage/phpunit-hhi": "^5.7",
+                "facebook/fbexpect": "^0.3.0",
+                "facebook/hack-codegen": "dev-master",
+                "hhvm/hhvm-autoload": "^1.5",
+                "phpunit/phpunit": "^5.7"
+            },
+            "bin": [
+                "bin/hhast-lint"
+            ],
+            "type": "library",
+            "notification-url": "https://packagist.org/downloads/",
+            "time": "2017-11-09T18:37:23+00:00"
         },
         {
             "name": "myclabs/deep-copy",
