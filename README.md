@@ -4,9 +4,26 @@ written in [Hack](http://hacklang.org).
 
 It is used to render [the Hack and HHVM documentation](https://docs.hhvm.com).
 
+## Why another Markdown library?
+
+For docs.hhvm.com, we wanted:
+
+- GitHub Flavored Markdown for familiarity
+- support for custom extensions
+
+Originally, the Ruby GFM pipeline was the best fit; over time, we started to want to:
+
+- make it easier and faster to contribute to docs.hhvm.com
+- remove the Ruby dependencies to make it easy to render markdown in other Hack projects
+- produce and mutate an AST before rendering
+- support multiple renders
+
+FBMarkdown exists to address all of these goals.
+
 ## Requirements
 
-- HHVM 3.21 or above.
+- HHVM 3.24 or above.
+- [hhvm-autoload](https://github.com/hhvm/hhvm-autoload)
 
 ## Installing FBMarkdown
 
