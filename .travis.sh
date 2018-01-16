@@ -4,7 +4,8 @@ hhvm --version
 curl https://getcomposer.org/installer | hhvm -d hhvm.jit=0 --php -- /dev/stdin --install-dir=/usr/local/bin --filename=composer
 
 cd /var/source
-hhvm -d hhvm.jit=0 /usr/local/bin/composer install
+hhvm -d hhvm.jit=0 /usr/local/bin/composer install --no-dev
+hhvm -d hhvm.jit=0 /usr/local/bin/composer install --ignore-platform-reqs
 
 hh_server --check $(pwd)
 hhvm -d hhvm.jit=0 vendor/bin/phpunit
