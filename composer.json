@@ -1,4 +1,7 @@
 {
+    "name": "facebook/fbmarkdown",
+    "description": "Markdown parser and renderer for Hack",
+    "keywords": ["facebook", "hack", "markdown", "gfm"],
     "require": {
         "hhvm/hhvm-autoload": "^1.5",
         "hhvm/hsl": "^1.1",
