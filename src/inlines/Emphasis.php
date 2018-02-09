@@ -430,7 +430,7 @@ class Emphasis extends Inline {
     int $position,
     vec<Stack\Node> $stack,
   ): void {
-    printf("-------------------- %d\n", $position);
+    \printf("-------------------- %d\n", $position);
     print(
       Vec\map_with_key(
         $stack,

@@ -21,7 +21,7 @@ function get_html_entity_table(): dict<string, string> {
     "Expected %s to exist",
     $file,
   );
-  $data = \json_decode(\file_get_contents($file), JSON_FB_HACK_ARRAYS);
+  $data = \json_decode(\file_get_contents($file), \JSON_FB_HACK_ARRAYS);
 
   return Dict\map($data, $x ==> $x['characters']);
 }

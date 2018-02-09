@@ -38,7 +38,7 @@ class TextNode extends Node {
 
   <<__Override>>
   public function debugDump(string $_markdown): string {
-    return '(text '.var_export($this->text, true).')';
+    return '(text '.\var_export($this->text, true).')';
   }
 }
 
@@ -69,7 +69,7 @@ class DelimiterNode extends TextNode {
     return '(delim '.
       (($this->flags & Inlines\Emphasis::IS_START) ? 'open' : '').
       (($this->flags & Inlines\Emphasis::IS_END) ? 'close' : '').
-      ' '.var_export($this->getText(), true).')';
+      ' '.\var_export($this->getText(), true).')';
   }
 }
 
@@ -86,7 +86,7 @@ class InlineNode extends Node {
 
   <<__Override>>
   public function debugDump(string $_markdown): string {
-    return '(inline '.get_class($this->content).')';
+    return '(inline '.\get_class($this->content).')';
   }
 }
 
@@ -125,7 +125,7 @@ class EmphasisNode extends Node {
     return '('.
       ($node->isStrong() ? 'strong' : 'em')
       .' '.
-      var_export(
+      \var_export(
         Str\slice($markdown, $this->startOffset, $this->getLength()),
         true,
       )

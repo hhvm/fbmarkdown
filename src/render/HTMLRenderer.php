@@ -109,7 +109,7 @@ class HTMLRenderer extends Renderer<string> {
     $level = $node->getLevel();
     return $node->getHeading()
       |> $this->renderNodes($$)
-      |> sprintf("<h%d>%s</h%d>\n", $level, $$, $level);
+      |> \sprintf("<h%d>%s</h%d>\n", $level, $$, $level);
   }
 
   <<__Override>>
@@ -210,7 +210,7 @@ class HTMLRenderer extends Renderer<string> {
       $start ='<ol>';
       $end = '</ol>';
     } else {
-      $start = sprintf('<ol start="%d">', $start);
+      $start = \sprintf('<ol start="%d">', $start);
       $end = '</ol>';
     }
     return $node->getItems()

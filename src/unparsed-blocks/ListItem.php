@@ -55,7 +55,7 @@ class ListItem extends ContainerBlock<Block> implements BlockProducer {
     invariant(
       \is_int($max_indent),
       'expected to get a maximum indentation from context, got a %s',
-      gettype($max_indent),
+      \gettype($max_indent),
     );
 
     // Consume leading whitespace

@@ -39,10 +39,10 @@ class RenderContext {
     $this->enabledExtensions = $this->extensions
       |> Vec\filter(
         $$,
-        $obj ==> Str\ends_with_ci(get_class($obj), "\\".$extension.'Extension'),
+        $obj ==> Str\ends_with_ci(\get_class($obj), "\\".$extension.'Extension'),
       )
       |> Vec\concat($$, $this->enabledExtensions)
-      |> Vec\unique_by($$, $x ==> get_class($x));
+      |> Vec\unique_by($$, $x ==> \get_class($x));
     return $this;
   }
 

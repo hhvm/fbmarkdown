@@ -37,7 +37,7 @@ extends Block {
       invariant(
         $pre_count > $lines->getCount(),
         'consuming failed to reduce line count with class "%s" on line "%s"',
-        get_class($child),
+        \get_class($child),
         $lines->getFirstLine(),
       );
     }

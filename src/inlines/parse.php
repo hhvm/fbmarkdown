@@ -30,7 +30,7 @@ function parse(
     'Offset: %d; Length: %d; Final class: %s',
     $offset,
     $length,
-    get_class(C\lastx($parsed)),
+    \get_class(C\lastx($parsed)),
   );
   return $parsed;
 }

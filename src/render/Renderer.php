@@ -175,7 +175,7 @@ abstract class Renderer<T> {
 
     invariant_violation(
       "Unhandled node type: %s",
-      get_class($node),
+      \get_class($node),
     );
   }
 }

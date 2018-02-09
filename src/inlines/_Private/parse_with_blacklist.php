@@ -43,7 +43,7 @@ function parse_with_blacklist (
     invariant(
       $new_offset > $offset,
       "Failed to consume any data with %s",
-      get_class($inline),
+      \get_class($inline),
     );
     $offset = $new_offset;
     $out[] = $inline;
