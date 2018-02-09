@@ -1,21 +1,18 @@
 #!/bin/sh
 set -ex
 hhvm --version
-curl https://getcomposer.org/installer | hhvm -d hhvm.jit=0 --php -- /dev/stdin --install-dir=/usr/local/bin --filename=composer
 
-cd /var/source
-hhvm -d hhvm.jit=0 /usr/local/bin/composer install --no-dev
-hhvm -d hhvm.jit=0 /usr/local/bin/composer install --ignore-platform-reqs
+composer install
 
+hh_client
+hhvm vendor/bin/phpunit
+hhvm vendor/bin/hhast-lint
+
+# Make sure we pass when a release is required
+EXPORT_DIR=$(mktemp -d)
+git archive --format=tar -o "${EXPORT_DIR}/exported.tar" HEAD
+cd "$EXPORT_DIR"
+tar -xf exported.tar
+composer install --no-dev
+echo > .hhconfig
 hh_server --check $(pwd)
-hhvm -d hhvm.jit=0 vendor/bin/phpunit
-hhvm -d hhvm.jit=0 vendor/bin/hhast-lint
-
-HHVM_VERSION=$(hhvm --php -r 'echo HHVM_VERSION_ID;' 2>/dev/null);
-if [ $HHVM_VERSION -ge 32002 ]; then
-  hhvm -d hhvm.php7.all=1 -d hhvm.jit=0 vendor/bin/phpunit tests/
-fi
-if [ $HHVM_VERSION -ge 32200 -a $HHVM_VERSION -lt 32300 ]; then
-  echo enable_experimental_tc_features = optional_shape_field, unknown_fields_shape_is_not_subtype_of_known_fields_shape >> .hhconfig
-  hh_server --check $(pwd)
-fi
