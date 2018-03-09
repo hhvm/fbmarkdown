@@ -53,7 +53,7 @@ class MarkdownRenderer extends Renderer<string> {
       $info = ' '.$info;
     }
 
-    return $separator.$info."\n".$node->getCode()."\n".$separator;
+    return $separator.$info."\n".$node->getCode()."\n".$separator."\n";
   }
 
   <<__Override>>
@@ -160,8 +160,11 @@ class MarkdownRenderer extends Renderer<string> {
         $$,
         $line ==> {
           $parsed = UnparsedBlocks\parse($ctx, $line)->getChildren();
-          if (!C\firstx($parsed) instanceof UnparsedBlocks\Paragraph)  {
+          if (!C\firstx($parsed) instanceof UnparsedBlocks\Paragraph) {
             return "    ".$line;
+          }
+          if (\preg_match('/^ {0,3}[=-]+ *$/', $line)) {
+            return "\\".$line;
           }
           return $line;
         },
