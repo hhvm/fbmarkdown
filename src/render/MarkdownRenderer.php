@@ -299,6 +299,17 @@ class MarkdownRenderer extends Renderer<string> {
     if ($node instanceof Inlines\BackslashEscape) {
       return "\\".$node->getContent();
     }
+    if ($node instanceof Inlines\EntityReference) {
+      // This matters if the entity reference is for whitespace: if we print
+      // it out raw, we might accidentally create an indented code block, or
+      // continue a more deeply nested block than we should.
+      return \mb_encode_numericentity(
+        $node->getContent(),
+        // start, end, offset, mask
+        [0, 0xffff, 0, 0xffff],
+        'UTF-8',
+      );
+    }
     return $node->getContent();
   }
 
