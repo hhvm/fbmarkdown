@@ -264,7 +264,11 @@ class MarkdownRenderer extends Renderer<string> {
 
   <<__Override>>
   protected function renderCodeSpan(Inlines\CodeSpan $node): string {
-    return '`'.$node->getCode().'`';
+    $code = $node->getCode();
+    if ($code === '') {
+      $code = ' ';
+    }
+    return '`'.$code.'`';
   }
 
   <<__Override>>
