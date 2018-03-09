@@ -22,6 +22,10 @@ final class EdgeCaseTest extends TestCase {
     return [
       tuple("- foo\n\n", "<ul>\n<li>foo</li>\n</ul>\n"),
       tuple("- foo\n\n\n", "<ul>\n<li>foo</li>\n</ul>\n"),
+      tuple(
+        '*foo **bar *baz bim** bam*',
+        '<p>*foo <em><em>bar <em>baz bim</em></em> bam</em></p>',
+      ),
     ];
   }
 
