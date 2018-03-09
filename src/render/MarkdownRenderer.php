@@ -129,7 +129,7 @@ class MarkdownRenderer extends Renderer<string> {
 
   <<__Override>>
   protected function renderListOfItems(Blocks\ListOfItems $node): string {
-    var_dump($node);
+    \var_dump($node);
     return $node->getItems()
       |> Vec\map($$, $item ==> $this->renderListItem($node, $item))
       |> Str\join($$, "\n");
