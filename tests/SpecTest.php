@@ -80,4 +80,43 @@ final class SpecTest extends TestCase {
   ): void {
     $this->assertExampleMatches($name, $in, $expected_html, $extension);
   }
+
+  /** Parse markdown to an AST, re-serialize it to markdown, then re-parse and
+   * finally render to HTML, and check that matches.
+   *
+   * This is basically a test of `MarkdownRenderer`.
+   *
+   * @dataProvider getSpecExamples
+   */
+  public function testSpecExampleNormalizesWithoutHTMLChange(
+    string $name,
+    string $original_md,
+    string $expected_html,
+    ?string $extension,
+  ): void {
+    $this->markTestIncomplete('Still a work in progress');
+    $parser_ctx = (new ParserContext())
+      ->enableHTML_UNSAFE()
+      ->disableExtensions();
+    $render_ctx = (new RenderContext())
+      ->disableExtensions();
+    if ($extension !== null) {
+      $parser_ctx->enableNamedExtension($extension);
+      $render_ctx->enableNamedExtension($extension);
+    }
+    $ast = parse($parser_ctx, $original_md);
+    $normalized_md = (new MarkdownRenderer($render_ctx))->render($ast);
+    print("--- ORIGINAL ---\n");
+    print($original_md."\n");
+    print("--- NORMALIZED ---\n");
+    print($normalized_md."\n");
+    print("--- END ---\n");
+
+    $this->assertExampleMatches(
+      $name,
+      $normalized_md,
+      $expected_html,
+      $extension,
+    );
+  }
 }
