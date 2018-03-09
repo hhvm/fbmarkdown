@@ -119,29 +119,52 @@ class MarkdownRenderer extends Renderer<string> {
       |> $md." '".$$."'";
   }
 
-  protected function renderTaskListItemExtension(
-    Blocks\ListOfItems $list,
-    Blocks\TaskListItemExtension $item,
-  ): string {
-    return __FUNCTION__;
-  }
-
   protected function renderListItem(
+    int $list_count,
     Blocks\ListOfItems $list,
     Blocks\ListItem $item,
   ): string {
-    if ($item instanceof Blocks\TaskListItemExtension) {
-      return $this->renderTaskListItemExtension($list, $item);
-    }
 
-    $sep = $list->getFirstNumber();
-    if ($sep === null) {
-      $sep = '- ';
+    $num = $list->getFirstNumber();
+    if ($num === null) {
+      /* This is a single loose list:
+       *
+       * - foo
+       * - bar
+       *
+       * - baz
+       *
+       * This is two tight lists:
+       *
+       * - foo
+       * - bar
+       *
+       * + baz
+       */
+      $seps = vec['-', '+', '*'];
+      $sep = $seps[$list_count % 3].' ';
     } else {
-      $sep = $sep.'. ';
+      /* One loose list:
+       *
+       * 1. foo
+       * 2. bar
+       *
+       * 3. baz
+       *
+       * Two tight lists:
+       *
+       * 1. foo
+       * 2. bar
+       * 3) baz
+       */
+      $seps = vec['.', ')'];
+      $sep = $num.$seps[$list_count % 2].' ';
     }
     $leading = Str\length($sep);
 
+    if ($item instanceof Blocks\TaskListItemExtension) {
+      $sep .= \sprintf('[%s] ', $item->isChecked() ? 'x' : ' ');
+    }
 
     if ($list->isLoose()) {
       $content = $item->getChildren()
@@ -175,8 +198,10 @@ class MarkdownRenderer extends Renderer<string> {
 
   <<__Override>>
   protected function renderListOfItems(Blocks\ListOfItems $node): string {
+    static $list_count = 0;
+    ++$list_count;
     return $node->getItems()
-      |> Vec\map($$, $item ==> $this->renderListItem($node, $item))
+      |> Vec\map($$, $item ==> $this->renderListItem($list_count, $node, $item))
       |> Str\join($$, "\n");
   }
 
