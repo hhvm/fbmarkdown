@@ -110,6 +110,8 @@ final class SpecTest extends TestCase {
     print($original_md."\n");
     print("--- NORMALIZED ---\n");
     print($normalized_md."\n");
+    print("--- AST ---\n");
+    \var_dump($ast);
     print("--- END ---\n");
 
     $this->assertExampleMatches(

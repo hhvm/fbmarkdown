@@ -61,7 +61,23 @@ class MarkdownRenderer extends Renderer<string> {
     $level = $node->getLevel();
     $content = $node->getHeading()
       |> $this->renderNodes($$);
-    return Str\repeat('#', $node->getLevel()).' '.$content;
+    if (!Str\contains($content, "\n")) {
+      return Str\repeat('#', $node->getLevel()).' '.$content."\n";
+    }
+    switch ($level) {
+      case 1:
+        $marker = '===';
+        break;
+      case 2:
+        $marker = '---';
+        break;
+      default:
+        invariant_violation(
+          "Can't handle a multi-line level %d heading.",
+          $level,
+        );
+    }
+    return $content."\n".$marker."\n";
   }
 
   <<__Override>>
@@ -129,7 +145,6 @@ class MarkdownRenderer extends Renderer<string> {
 
   <<__Override>>
   protected function renderListOfItems(Blocks\ListOfItems $node): string {
-    \var_dump($node);
     return $node->getItems()
       |> Vec\map($$, $item ==> $this->renderListItem($node, $item))
       |> Str\join($$, "\n");
@@ -137,7 +152,22 @@ class MarkdownRenderer extends Renderer<string> {
 
   <<__Override>>
   protected function renderParagraph(Blocks\Paragraph $node): string {
-    return $this->renderNodes($node->getContents())."\n\n";
+    $ctx = new UnparsedBlocks\Context();
+    \var_dump($node);
+    return $this->renderNodes($node->getContents())
+      |> Str\split($$, "\n")
+      |> Vec\map(
+        $$,
+        $line ==> {
+          $parsed = UnparsedBlocks\parse($ctx, $line)->getChildren();
+          if (!C\firstx($parsed) instanceof UnparsedBlocks\Paragraph)  {
+            return "    ".$line;
+          }
+          return $line;
+        },
+      )
+      |> Str\join($$, "\n")
+      |> $$."\n\n";
   }
 
   <<__Override>>
@@ -211,7 +241,7 @@ class MarkdownRenderer extends Renderer<string> {
 
   <<__Override>>
   protected function renderThematicBreak(): string {
-    return "<hr />\n";
+    return "\n***\n";
   }
 
   <<__Override>>
@@ -223,6 +253,9 @@ class MarkdownRenderer extends Renderer<string> {
   protected function renderInlineWithPlainTextContent(
     Inlines\InlineWithPlainTextContent $node,
   ): string {
+    if ($node instanceof Inlines\BackslashEscape) {
+      return "\\".$node->getContent();
+    }
     return $node->getContent();
   }
 
