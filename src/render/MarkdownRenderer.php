@@ -289,7 +289,7 @@ class MarkdownRenderer extends Renderer<string> {
 
   <<__Override>>
   protected function renderAutoLink(Inlines\AutoLink $node): string {
-    return __FUNCTION__;
+    return '<'.$node->getDestination().'>';
   }
 
   <<__Override>>
