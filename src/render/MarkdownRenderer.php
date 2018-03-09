@@ -168,7 +168,8 @@ class MarkdownRenderer extends Renderer<string> {
 
     if ($list->isLoose()) {
       $content = $item->getChildren()
-       |> $this->renderNodes($$);
+       |> $this->renderNodes($$)
+       |> $$."\n";
     } else {
       $content = $item->getChildren()
         |> Vec\map(
@@ -208,7 +209,6 @@ class MarkdownRenderer extends Renderer<string> {
   <<__Override>>
   protected function renderParagraph(Blocks\Paragraph $node): string {
     $ctx = new UnparsedBlocks\Context();
-    \var_dump($node);
     return $this->renderNodes($node->getContents())
       |> Str\split($$, "\n")
       |> Vec\map(
