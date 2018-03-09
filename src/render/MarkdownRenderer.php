@@ -12,7 +12,7 @@
 namespace Facebook\Markdown;
 
 use type Facebook\Markdown\Blocks\TableExtensionColumnAlignment;
-use namespace HH\Lib\{C, Str, Vec};
+use namespace HH\Lib\{C, Math, Str, Vec};
 
 /** Re-create Markdwon from the AST */
 class MarkdownRenderer extends Renderer<string> {
@@ -164,9 +164,12 @@ class MarkdownRenderer extends Renderer<string> {
     }
     return $content
       |> Str\split($$, "\n")
-      |> Vec\map($$, $line ==> Str\repeat(' ', $leading).$line)
+      |> Vec\map(
+        $$,
+        $line ==> ($line === '') ? $line : (Str\repeat(' ', $leading).$line),
+      )
       |> Str\join($$, "\n")
-      |> Str\slice($$, $leading)
+      |> Str\slice($$, Math\minva(Str\length($$), $leading))
       |> $sep.$$;
   }
 
