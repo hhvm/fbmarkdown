@@ -43,7 +43,7 @@ class MarkdownRenderer extends Renderer<string> {
 
   <<__Override>>
   protected function renderCodeBlock(Blocks\CodeBlock $node): string {
-    if (Str\contains($node->getCode(), "---")) {
+    if (Str\contains($node->getCode(), '```')) {
       $separator = '~~~';
     } else {
       $separator = '```';
