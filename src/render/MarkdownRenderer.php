@@ -16,20 +16,24 @@ use namespace HH\Lib\{C, Math, Str, Vec};
 
 /** Re-create Markdwon from the AST */
 class MarkdownRenderer extends Renderer<string> {
+  private ?string $outContext = null;
+
   const keyset<classname<RenderFilter>> EXTENSIONS = keyset[
     TagFilterExtension::class,
   ];
 
   <<__Override>>
   protected function renderNodes(vec<ASTNode> $nodes): string {
+    $this->outContext = '';
     return $nodes
       |> Vec\map(
         $$,
         $node ==> {
           $content = $this->render($node);
           if ($node instanceof Blocks\Block) {
-            return $content."\n\n";
+            $content = $content."\n\n";
           }
+          $this->outContext .= $content;
           return $content;
         },
       )
@@ -316,14 +320,18 @@ class MarkdownRenderer extends Renderer<string> {
   <<__Override>>
   protected function renderCodeSpan(Inlines\CodeSpan $node): string {
     $code = $node->getCode();
-    $len = Str\length($code);
+    $len = Str\length((string) $this->outContext) + Str\length($code);
 
     $sep = '`';
     for ($sep_len = 1; $sep_len <= $len + 1; ++$sep_len) {
       $sep = Str\repeat('`', $sep_len);
-      if (!Str\contains($code, $sep)) {
-        break;
+      if (Str\contains($code, $sep)) {
+        continue;
       }
+      if (Str\contains((string) $this->outContext, $sep)) {
+        continue;
+      }
+      break;
     }
 
     return $sep.' '.Str\trim($code).' '.$sep;
