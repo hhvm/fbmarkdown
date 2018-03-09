@@ -20,4 +20,16 @@ class LinkReferenceDefinition extends LeafBlock {
     private ?vec<Inline> $title,
   ) {
   }
+
+  public function getLabel(): string {
+    return $this->label;
+  }
+
+  public function getDestination(): string {
+    return $this->destination;
+  }
+
+  public function getTitle(): ?vec<Inline> {
+    return $this->title;
+  }
 }

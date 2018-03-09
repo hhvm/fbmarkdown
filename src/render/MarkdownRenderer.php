@@ -99,7 +99,23 @@ class MarkdownRenderer extends Renderer<string> {
   protected function renderLinkReferenceDefinition(
     Blocks\LinkReferenceDefinition $def,
   ): string {
-    return __FUNCTION__;
+    // This doesn't end up mattering as we currently normalize out the link
+    // reference definitions when constructing the AST; keeping them in case
+    // this is mixed with other markdown, or if we end up creating a separate
+    // ReferenceLink AST node that renderers need to deal with.
+    $md = \sprintf(
+      '[%s]: <%s>',
+      $def->getLabel(),
+      $def->getDestination(),
+    );
+    $title = $def->getTitle();
+    if ($title === null) {
+      return $md;
+    }
+
+    return $this->renderNodes($title)
+      |> Str\replace($$, "'", "\\'")
+      |> $md." '".$$."'";
   }
 
   protected function renderTaskListItemExtension(
@@ -291,7 +307,7 @@ class MarkdownRenderer extends Renderer<string> {
 
   <<__Override>>
   protected function renderHardLineBreak(): string {
-    return "<br />";
+    return "\\\n";
   }
 
   <<__Override>>
@@ -301,7 +317,18 @@ class MarkdownRenderer extends Renderer<string> {
 
   <<__Override>>
   protected function renderLink(Inlines\Link $node): string {
-    return __FUNCTION__;
+    $text = $this->renderNodes($node->getText());
+    $destination = $node->getDestination();
+    $title = $node->getTitle();
+    if ($title === null) {
+      return \sprintf('[%s](<%s>)', $text, $destination);
+    }
+    return \sprintf(
+      "[%s](<%s> '%s')",
+      $text,
+      $destination,
+      Str\replace($title, "'", "\\'"),
+    );
   }
 
   <<__Override>>
