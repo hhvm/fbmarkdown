@@ -11,6 +11,7 @@
 
 namespace Facebook\Markdown;
 
+use type Facebook\Markdown\Blocks\TableExtensionColumnAlignment;
 use namespace HH\Lib\{C, Str, Vec};
 
 /** Re-create Markdwon from the AST */
@@ -199,72 +200,58 @@ class MarkdownRenderer extends Renderer<string> {
   }
 
   <<__Override>>
-  protected function renderTableExtension(Blocks\TableExtension $node): string {
-    $html = "<table>\n".$this->renderTableHeader($node);
-
-    $data = $node->getData();
-    if (C\is_empty($data)) {
-      return $html."</table>\n";
-    }
-    $html .= "\n<tbody>";
-
-    $row_idx = -1;
-    foreach ($data as $row) {
-      ++$row_idx;
-      $html .= "\n".$this->renderTableDataRow($node, $row_idx, $row);
-    }
-    return $html."</tbody></table>\n";
+  protected function renderTableExtension(
+    Blocks\TableExtension $table,
+  ): string {
+    return $table->getData()
+      |> Vec\map($$, $row ==> $this->renderTableDataRow($row))
+      |> Str\join($$, "\n")
+      |> $this->renderTableHeader($table)."\n".$$;
   }
 
   protected function renderTableHeader(Blocks\TableExtension $node): string {
-    $html = "<thead>\n<tr>\n";
+    $header_row = $node->getHeader()
+      |> Vec\map($$, $cell ==> $this->renderTableDataCell($cell))
+      |> Str\join($$, ' | ')
+      |> '| '.$$.' |';
 
-    $alignments = $node->getColumnAlignments();
-    $header = $node->getHeader();
-    for ($i = 0; $i < C\count($header); ++$i) {
-      $cell = $header[$i];
-      $alignment = $alignments[$i];
-      if ($alignment !== null) {
-        $alignment = ' align="'.$alignment.'"';
-      }
-      $html .=
-        '<th'.$alignment.'>'.
-        $this->renderNodes($cell).
-        "</th>\n";
-    }
-    $html .= "</tr>\n</thead>";
-    return $html;
+    $delimiter_row = $node->getColumnAlignments()
+      |> Vec\map(
+        $$,
+        $alignment ==> {
+          if ($alignment === null) {
+            return '-';
+          }
+          switch ($alignment) {
+            case TableExtensionColumnAlignment::LEFT:
+              return ':-';
+            case TableExtensionColumnAlignment::RIGHT:
+              return '-:';
+            case TableExtensionColumnAlignment::CENTER:
+              return ':-:';
+          }
+        },
+      )
+      |> Str\join($$, ' | ')
+      |> '| '.$$.' |';
+
+    return $header_row."\n".$delimiter_row;
   }
 
   protected function renderTableDataRow(
-    Blocks\TableExtension $table,
-    int $row_idx,
     Blocks\TableExtension::TRow $row,
   ): string {
-    $html = "<tr>";
-    for ($i = 0; $i < C\count($row); ++$i) {
-      $cell = $row[$i];
-
-      $html .= "\n".$this->renderTableDataCell($table, $row_idx, $i, $cell);
-    }
-    $html .= "\n</tr>";
-    return $html;
+    return $row
+      |> Vec\map($$, $cell ==> $this->renderTableDataCell($cell))
+      |> Str\join($$, ' | ')
+      |> '| '.$$.' |';
   }
 
   protected function renderTableDataCell(
-    Blocks\TableExtension $table,
-    int $row_idx,
-    int $col_idx,
     Blocks\TableExtension::TCell $cell,
   ): string {
-    $alignment = $table->getColumnAlignments()[$col_idx];
-    if ($alignment !== null) {
-      $alignment = ' align="'.$alignment.'"';
-    }
-    return
-      "<td".$alignment.'>'.
-      $this->renderNodes($cell).
-      "</td>";
+    return $this->renderNodes($cell)
+      |> Str\replace($$, "|", "\\|");
   }
 
   <<__Override>>
