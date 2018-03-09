@@ -22,9 +22,19 @@ class MarkdownRenderer extends Renderer<string> {
   <<__Override>>
   protected function renderNodes(vec<ASTNode> $nodes): string {
     return $nodes
-      |> Vec\map($$, $node ==> $this->render($node))
+      |> Vec\map(
+        $$,
+        $node ==> {
+          $content = $this->render($node);
+          if ($node instanceof Blocks\Block) {
+            return $content."\n\n";
+          }
+          return $content;
+        },
+      )
       |> Vec\filter($$, $line ==> $line !== '')
-      |> Str\join($$, '');
+      |> Str\join($$, '')
+      |> Str\strip_suffix($$, "\n\n");
   }
 
   <<__Override>>
@@ -53,7 +63,7 @@ class MarkdownRenderer extends Renderer<string> {
       $info = ' '.$info;
     }
 
-    return $separator.$info."\n".$node->getCode()."\n".$separator."\n";
+    return $separator.$info."\n".$node->getCode()."\n".$separator;
   }
 
   <<__Override>>
@@ -62,7 +72,7 @@ class MarkdownRenderer extends Renderer<string> {
     $content = $node->getHeading()
       |> $this->renderNodes($$);
     if (!Str\contains($content, "\n")) {
-      return Str\repeat('#', $node->getLevel()).' '.$content."\n";
+      return Str\repeat('#', $node->getLevel()).' '.$content;
     }
     switch ($level) {
       case 1:
@@ -77,7 +87,7 @@ class MarkdownRenderer extends Renderer<string> {
           $level,
         );
     }
-    return $content."\n".$marker."\n";
+    return $content."\n".$marker;
   }
 
   <<__Override>>
@@ -169,8 +179,7 @@ class MarkdownRenderer extends Renderer<string> {
           return $line;
         },
       )
-      |> Str\join($$, "\n")
-      |> $$."\n\n";
+      |> Str\join($$, "\n");
   }
 
   <<__Override>>
@@ -244,7 +253,7 @@ class MarkdownRenderer extends Renderer<string> {
 
   <<__Override>>
   protected function renderThematicBreak(): string {
-    return "\n***\n";
+    return "\n***";
   }
 
   <<__Override>>
@@ -282,7 +291,7 @@ class MarkdownRenderer extends Renderer<string> {
 
   <<__Override>>
   protected function renderHardLineBreak(): string {
-    return "<br />\n";
+    return "<br />";
   }
 
   <<__Override>>
