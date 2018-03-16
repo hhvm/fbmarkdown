@@ -31,6 +31,10 @@ final class EdgeCaseTest extends TestCase {
         '*foo **bar *baz bim** bam*',
         "<p>*foo <em><em>bar <em>baz bim</em></em> bam</em></p>\n",
       ),
+      tuple(
+        '*foo __bar *baz bim__ bam*',
+        "<p><em>foo <strong>bar *baz bim</strong> bam</em></p>\n",
+      ),
     ];
   }
 
