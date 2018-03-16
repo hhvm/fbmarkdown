@@ -339,11 +339,19 @@ class MarkdownRenderer extends Renderer<string> {
 
   <<__Override>>
   protected function renderEmphasis(Inlines\Emphasis $node): string {
-    $tag = $node->isStrong() ? '**' : '*';
-    return $node->getContent()
+    $content = $node->getContent()
       |> Vec\map($$, $item ==> $this->render($item))
-      |> Str\join($$, '')
-      |> $tag.$$.$tag;
+      |> Str\join($$, '');
+
+    if (Str\contains($content, '*')) {
+      $tag = '_';
+    } else {
+      $tag = '*';
+    }
+    if ($node->isStrong()) {
+      $tag .= $tag;
+    }
+    return $tag.$content.$tag;
   }
 
   <<__Override>>
