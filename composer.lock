@@ -94,32 +94,31 @@
         },
         {
             "name": "hhvm/hsl",
-            "version": "v1.3.0",
+            "version": "v1.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/hhvm/hsl.git",
-                "reference": "556bb0a0749226417dd0f53567571ecc008f37f2"
+                "reference": "2d40281ec595b25a09bbe51d9216edbf1ad55a42"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hhvm/hsl/zipball/556bb0a0749226417dd0f53567571ecc008f37f2",
-                "reference": "556bb0a0749226417dd0f53567571ecc008f37f2",
+                "url": "https://api.github.com/repos/hhvm/hsl/zipball/2d40281ec595b25a09bbe51d9216edbf1ad55a42",
+                "reference": "2d40281ec595b25a09bbe51d9216edbf1ad55a42",
                 "shasum": ""
             },
             "require": {
+                "hhvm": "^3.23.2",
                 "hhvm/hhvm-autoload": "^1.4"
             },
             "require-dev": {
                 "91carriage/phpunit-hhi": "^5.7",
-                "facebook/definition-finder": "^1.6.1",
                 "facebook/fbexpect": "^0.4",
-                "hhvm": "^3.23.2",
                 "phpunit/phpunit": "^5.7"
             },
             "type": "library",
             "notification-url": "https://packagist.org/downloads/",
             "description": "The Hack Standard Library",
-            "time": "2018-02-05T22:10:31+00:00"
+            "time": "2018-03-09T21:53:48+00:00"
         },
         {
             "name": "hhvm/type-assert",
