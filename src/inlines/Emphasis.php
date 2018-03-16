@@ -209,8 +209,8 @@ class Emphasis extends Inline {
         $mid_nodes[] = new Stack\DelimiterNode(
           $opener_text,
           $opener->getFlags(),
-          $opener->getStartOffset() + $chomp,
-          $opener->getEndOffset(),
+          $opener->getStartOffset(),
+          $opener->getEndOffset() - $chomp,
         );
       } else {
         $position--;
@@ -262,19 +262,15 @@ class Emphasis extends Inline {
     );
 
     if ($first === null) {
+      //self::debugDump($markdown, -1, $stack);
       return null;
     }
     assert($first instanceof Stack\EmphasisNode);
+    $leading = Str\slice($markdown, $initial_offset, $first->getStartOffset() - $initial_offset);
+    $leading = parse($context, $leading);
 
     $children = Vec\concat(
-      parse(
-        $context,
-        Str\slice(
-          $markdown,
-          $initial_offset,
-          $first->getStartOffset() - $initial_offset,
-        ),
-      ),
+      $leading,
       vec[$first->getContent()],
     );
 

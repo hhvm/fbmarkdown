@@ -22,9 +22,14 @@ final class EdgeCaseTest extends TestCase {
     return [
       tuple("- foo\n\n", "<ul>\n<li>foo</li>\n</ul>\n"),
       tuple("- foo\n\n\n", "<ul>\n<li>foo</li>\n</ul>\n"),
+      // Already covered in the spec, but emphasizing here as they
+      // illustrate correct binding for the next problme
+      tuple('**foo*', "<p>*<em>foo</em></p>\n"),
+      tuple('*foo**', "<p><em>foo</em>*</p>\n"),
+      // Uncovered a bug
       tuple(
         '*foo **bar *baz bim** bam*',
-        '<p>*foo <em><em>bar <em>baz bim</em></em> bam</em></p>',
+        "<p>*foo <em><em>bar <em>baz bim</em></em> bam</em></p>\n",
       ),
     ];
   }
