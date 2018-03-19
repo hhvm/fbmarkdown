@@ -11,7 +11,7 @@
 
 namespace Facebook\Markdown\UnparsedBlocks;
 
-use namespace HH\Lib\{C, Dict};
+use namespace HH\Lib\{C, Dict, Vec};
 
 
 abstract class ContainerBlock<TChild as Block>
@@ -33,13 +33,17 @@ extends Block {
     while (!$lines->isEmpty()) {
       $pre_count = $lines->getCount();
       list($child, $lines) = self::consumeSingle($context, $lines);
-      $children[] = $child;
       invariant(
         $pre_count > $lines->getCount(),
         'consuming failed to reduce line count with class "%s" on line "%s"',
         \get_class($child),
         $lines->getFirstLine(),
       );
+      if ($child instanceof BlockSequence) {
+        $children = Vec\concat($children, $child->getChildren());
+      } else {
+        $children[] = $child;
+      }
     }
     return $children;
   }

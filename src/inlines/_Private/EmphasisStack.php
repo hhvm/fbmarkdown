@@ -16,6 +16,20 @@ use type Facebook\Markdown\Inlines\{Context, Inline};
 use namespace HH\Lib\Str;
 
 abstract class Node {
+  public function __construct(
+    private int $startOffset,
+    private int $endOffset,
+  ) {
+  }
+
+  final public function getStartOffset(): int {
+    return $this->startOffset;
+  }
+
+  final public function getEndOffset(): int {
+    return $this->endOffset;
+  }
+
   abstract public function toInlines(Context $ctx): vec<Inline>;
 
   abstract public function debugDump(string $markdown): string;
@@ -24,7 +38,17 @@ abstract class Node {
 class TextNode extends Node {
   public function __construct(
     private string $text,
+    int $startOffset,
+    int $endOffset,
   ) {
+    invariant(
+      $endOffset === $startOffset + Str\length($text),
+      'Length mismatch: %d %d %d',
+      $startOffset,
+      Str\length($text),
+      $endOffset,
+    );
+    parent::__construct($startOffset, $endOffset);
   }
 
   public function getText(): string {
@@ -38,7 +62,8 @@ class TextNode extends Node {
 
   <<__Override>>
   public function debugDump(string $_markdown): string {
-    return '(text '.\var_export($this->text, true).')';
+    return '(text '.\var_export($this->text, true).' '.
+      $this->getStartOffset().'-'.$this->getEndOffset().')';
   }
 }
 
@@ -46,22 +71,14 @@ class DelimiterNode extends TextNode {
   public function __construct(
     string $text,
     private int $flags,
-    private int $startOffset,
-    private int $endOffset,
+    int $startOffset,
+    int $endOffset,
   ) {
-    parent::__construct($text);
+    parent::__construct($text, $startOffset, $endOffset);
   }
 
   public function getFlags(): int {
     return $this->flags;
-  }
-
-  public function getStartOffset(): int {
-    return $this->startOffset;
-  }
-
-  public function getEndOffset(): int {
-    return $this->endOffset;
   }
 
   <<__Override>>
@@ -76,7 +93,10 @@ class DelimiterNode extends TextNode {
 class InlineNode extends Node {
   public function __construct(
     private Inline $content,
+    int $startOffset,
+    int $endOffset,
   ) {
+    parent::__construct($startOffset, $endOffset);
   }
 
   <<__Override>>
@@ -93,9 +113,10 @@ class InlineNode extends Node {
 class EmphasisNode extends Node {
   public function __construct(
     private Inlines\Emphasis $content,
-    private int $startOffset,
-    private int $endOffset,
+    int $startOffset,
+    int $endOffset,
   ) {
+    parent::__construct($startOffset, $endOffset);
   }
 
   public function getContent(): Inlines\Emphasis {
@@ -107,16 +128,8 @@ class EmphasisNode extends Node {
     return vec[$this->content];
   }
 
-  public function getStartOffset(): int {
-    return $this->startOffset;
-  }
-
-  public function getEndOffset(): int {
-    return $this->endOffset;
-  }
-
   public function getLength(): int {
-    return ($this->endOffset - $this->startOffset);
+    return ($this->getEndOffset() - $this->getStartOffset());
   }
 
   <<__Override>>
@@ -126,9 +139,11 @@ class EmphasisNode extends Node {
       ($node->isStrong() ? 'strong' : 'em')
       .' '.
       \var_export(
-        Str\slice($markdown, $this->startOffset, $this->getLength()),
+        Str\slice($markdown, $this->getStartOffset(), $this->getLength()),
         true,
       )
+      .' '
+      .$this->getStartOffset().'-'.$this->getEndOffset()
       .')';
   }
 }

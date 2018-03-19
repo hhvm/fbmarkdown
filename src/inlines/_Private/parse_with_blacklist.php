@@ -12,7 +12,7 @@
 namespace Facebook\Markdown\Inlines\_Private;
 
 use namespace Facebook\Markdown\Inlines;
-use namespace HH\Lib\{C, Str};
+use namespace HH\Lib\{C, Str, Vec};
 
 function parse_with_blacklist (
   Inlines\Context $context,
@@ -46,7 +46,11 @@ function parse_with_blacklist (
       \get_class($inline),
     );
     $offset = $new_offset;
-    $out[] = $inline;
+    if ($inline instanceof Inlines\InlineSequence) {
+      $out = Vec\concat($out, $inline->getChildren());
+    } else {
+      $out[] = $inline;
+    }
   }
   return tuple($out, $offset);
 }

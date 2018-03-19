@@ -88,13 +88,16 @@ class Emphasis extends Inline {
     for (; $offset < $len; ++$offset) {
       $inline = self::consumeHigherPrecedence($context, $markdown, $offset);
       if ($inline !== null) {
+        list($inline, $end_offset) = $inline;
         if ($text !== '') {
-          $stack[] = new Stack\TextNode($text);
+          // Leading plain text - *not* what we just matched
+          $leading_end = $offset;
+          $leading_start = $leading_end - Str\length($text);
+          $stack[] = new Stack\TextNode($text, $leading_start, $leading_end);
           $text = '';
         }
-        list($inline, $offset) = $inline;
-        $offset--;
-        $stack[] = new Stack\InlineNode($inline);
+        $stack[] = new Stack\InlineNode($inline, $offset, $end_offset);
+        $offset = $end_offset - 1;
         continue;
       }
 
@@ -110,9 +113,13 @@ class Emphasis extends Inline {
         ) {
           $flags |= self::IS_END;
         }
+
         if ($flags !== 0) {
           if ($text !== '') {
-            $stack[] = new Stack\TextNode($text);
+            // Leading plain text again, before the delimiter
+            $leading_end = $offset;
+            $leading_start = $leading_end - Str\length($text);
+            $stack[] = new Stack\TextNode($text, $leading_start, $leading_end);
             $text = '';
           }
           $stack[] =
@@ -126,8 +133,12 @@ class Emphasis extends Inline {
     }
 
     if ($text !== '') {
-      $stack[] = new Stack\TextNode($text);
+      $end_offset = $offset;
+      $start_offset = $end_offset - Str\length($text);
+      $stack[] = new Stack\TextNode($text, $start_offset, $end_offset);
     }
+
+    //self::debugDump($markdown, -123, $stack);
 
     // Now we have a stack, process it; this is a modified form of the
     // `process_emphasis` procedure from GFM specification appendix
@@ -193,7 +204,11 @@ class Emphasis extends Inline {
       if ($opener === null) {
         $openers_bottom[$char][$closer_len] = $position - 1;
         if (!($closer_flags & self::IS_START)) {
-          $stack[$closer_idx] = new Stack\TextNode($closer_text);
+          $stack[$closer_idx] = new Stack\TextNode(
+            $closer_text,
+            $closer->getStartOffset(),
+            $closer->getEndOffset(),
+          );
         }
         ++$position;
         continue;
@@ -261,41 +276,14 @@ class Emphasis extends Inline {
       );
     }
 
-    // Stack is fully processed now; question is what to consume. To play it
-    // safe for precedence, we're consuming as little as possible.
-
-    $first = C\first($stack);
-    if ($first instanceof Stack\EmphasisNode) {
-      return tuple(
-        $first->getContent(),
-        $first->getEndOffset(),
-      );
-    }
-
-    $first = C\find(
-      $stack,
-      $elem ==> $elem instanceof Stack\EmphasisNode,
-    );
-
-    if ($first === null) {
-      //self::debugDump($markdown, -1, $stack);
-      return null;
-    }
-    assert($first instanceof Stack\EmphasisNode);
-    $leading = Str\slice($markdown, $initial_offset, $first->getStartOffset() - $initial_offset);
-    // This is eventually going to recurse into self::consume, but that's fine:
-    // if there were matching pairs, we'd have an EmphasisNode somewhere in here.
-    $leading = parse($context, $leading);
-
-    $children = Vec\concat(
-      $leading,
-      vec[$first->getContent()],
-    );
-
-    return tuple(
-      new InlineSequence($children),
-      $first->getEndOffset(),
-    );
+    // Stack is fully processed now; given emphasis precedence and the requirements of
+    // handling deeply nested emphasis, we've actually fully parsed the remainder of
+    // this inline, so return it all.
+    //self::debugDump($markdown, -1, $stack);
+    return $stack
+      |> Vec\map($$, $node ==> $node->toInlines($context))
+      |> Vec\flatten($$)
+      |> tuple(new InlineSequence($$), C\lastx($stack)->getEndOffset());
   }
 
   private static function consumeStackSlice(
