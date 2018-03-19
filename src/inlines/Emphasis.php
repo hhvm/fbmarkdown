@@ -82,6 +82,8 @@ class Emphasis extends Inline {
 
     $text = '';
 
+    // Tokenize into a stack of TextNodes, InlineNodes, and DelimiterNodes
+
     $len = Str\length($markdown);
     for (; $offset < $len; ++$offset) {
       $inline = self::consumeHigherPrecedence($context, $markdown, $offset);
@@ -127,10 +129,11 @@ class Emphasis extends Inline {
       $stack[] = new Stack\TextNode($text);
     }
 
-    // Modified `process_emphasis` procedure from GFM spec appendix
+    // Now we have a stack, process it; this is a modified form of the
+    // `process_emphasis` procedure from GFM specification appendix
     $position = 0;
     $openers_bottom = dict[
-      '*' => vec[0, 0, 0],
+      '*' => vec[0, 0, 0], // indexed by number of chars in delimiter
       '_' => vec[0, 0, 0],
     ];
 
@@ -196,6 +199,8 @@ class Emphasis extends Inline {
         continue;
       }
 
+      // Have an opener and closer pair
+
       $opener_text = $opener->getText();
       $strong = Str\length($opener_text) >= 2 && Str\length($closer_text) >= 2;
 
@@ -203,9 +208,13 @@ class Emphasis extends Inline {
       $opener_text = Str\slice($opener_text, $chomp);
       $closer_text = Str\slice($closer_text, $chomp);
 
+      // We're going to throw away the existing opener, closer, and everything
+      // in between; we build up the replacements here.
       $mid_nodes = vec[];
 
       if ($opener_text !== '') {
+        // Remove the chars from the end of the delimiter as
+        // `**foo*` is `*<em>foo</em>`, not `<em>*foo</em>`
         $mid_nodes[] = new Stack\DelimiterNode(
           $opener_text,
           $opener->getFlags(),
@@ -213,6 +222,9 @@ class Emphasis extends Inline {
           $opener->getEndOffset() - $chomp,
         );
       } else {
+        // We just ate up the last of this delimiter, so there's now none.
+        // Adjust the stack offset, as we're effectively removing something
+        // earlier in the stack than the current position
         $position--;
       }
 
@@ -232,6 +244,8 @@ class Emphasis extends Inline {
       $position -= $content_length;
 
       if ($closer_text !== '') {
+        // Same as openers, however we take it from the start, as
+        // `*foo**` is `<em>foo</em>*`, not `<em>foo*</em>`
         $mid_nodes[] = new Stack\DelimiterNode(
           $closer_text,
           $closer->getFlags(),
@@ -247,6 +261,8 @@ class Emphasis extends Inline {
       );
     }
 
+    // Stack is fully processed now; question is what to consume. To play it
+    // safe for precedence, we're consuming as little as possible.
 
     $first = C\first($stack);
     if ($first instanceof Stack\EmphasisNode) {
@@ -267,6 +283,8 @@ class Emphasis extends Inline {
     }
     assert($first instanceof Stack\EmphasisNode);
     $leading = Str\slice($markdown, $initial_offset, $first->getStartOffset() - $initial_offset);
+    // This is eventually going to recurse into self::consume, but that's fine:
+    // if there were matching pairs, we'd have an EmphasisNode somewhere in here.
     $leading = parse($context, $leading);
 
     $children = Vec\concat(
