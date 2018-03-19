@@ -50,13 +50,40 @@ class Emphasis extends Inline {
   public static function consume(
     Context $context,
     string $markdown,
-    int $initial_offset,
+    int $offset,
   ): ?(Inline, int) {
+    // Get DelimiterNodes, TextNodes, etc
+    $stack = self::tokenize($context, $markdown, $offset);
+    if ($stack === null) {
+      return null;
+    }
+
+    // Create `EmphasisNode`s, remove or shorten some `DelimiterNode`s at the boundaries
+    $stack = self::processEmphasis($context, $stack);
+
+    // Stack is fully processed - just need to convert it from stack nodes to AST nodes
+    return $stack
+      |> Vec\map($$, $node ==> $node->toInlines($context))
+      |> Vec\flatten($$)
+      |> tuple(new InlineSequence($$), C\lastx($stack)->getEndOffset());
+  }
+
+  /**
+   * Create a stack of `TextNode`, `InlineNode`, and `DelimiterNode`s.
+   *
+   * There will not yet be any `EmphasisNode`s - those will be created by `processEmphasis()`.
+   */
+  private static function tokenize(
+     Context $context,
+     string $markdown,
+     int $initial_offset,
+  ): ?vec<Stack\Node> {
     $offset = $initial_offset;
     if (!self::isStartOfRun($context, $markdown, $offset)) {
       return null;
     }
     $first = $markdown[$offset];
+
     // This is tricky as until we find the closing marker, we don't know if
     // `***` means:
     //  - `<strong><em>`
@@ -83,7 +110,6 @@ class Emphasis extends Inline {
     $text = '';
 
     // Tokenize into a stack of TextNodes, InlineNodes, and DelimiterNodes
-
     $len = Str\length($markdown);
     for (; $offset < $len; ++$offset) {
       $inline = self::consumeHigherPrecedence($context, $markdown, $offset);
@@ -138,18 +164,26 @@ class Emphasis extends Inline {
       $stack[] = new Stack\TextNode($text, $start_offset, $end_offset);
     }
 
-    //self::debugDump($markdown, -123, $stack);
+    return $stack;
+  }
 
-    // Now we have a stack, process it; this is a modified form of the
-    // `process_emphasis` procedure from GFM specification appendix
+  /**
+   * Take a stack of `TextNode`, `InlineNode`, and `DelimiterNode`, and potentially create
+   * `EmphasisNode` replacing some of them (or their content).
+   *
+   * This is derived from `process_emphasis` in the appendix of the Github-Flavored-Markdown specification.
+   */
+  private static function processEmphasis(
+    Context $context,
+    vec<Stack\Node> $stack,
+  ): vec<Stack\Node> {
     $position = 0;
     $openers_bottom = dict[
-      '*' => vec[0, 0, 0], // indexed by number of chars in delimiter
+      '*' => vec[0, 0, 0], // indexed by number of chars in delimiter - [0] is unused, but convenient
       '_' => vec[0, 0, 0],
     ];
 
     while ($position < C\count($stack)) {
-      // self::debugDump($markdown, $position, $stack);
       $closer_idx = self::findCloser($stack, $position);
       if ($closer_idx === null) {
         break;
@@ -276,14 +310,7 @@ class Emphasis extends Inline {
       );
     }
 
-    // Stack is fully processed now; given emphasis precedence and the requirements of
-    // handling deeply nested emphasis, we've actually fully parsed the remainder of
-    // this inline, so return it all.
-    //self::debugDump($markdown, -1, $stack);
-    return $stack
-      |> Vec\map($$, $node ==> $node->toInlines($context))
-      |> Vec\flatten($$)
-      |> tuple(new InlineSequence($$), C\lastx($stack)->getEndOffset());
+    return $stack;
   }
 
   private static function consumeStackSlice(
