@@ -364,7 +364,13 @@ class MarkdownRenderer extends Renderer<string> {
 
   <<__Override>>
   protected function renderImage(Inlines\Image $node): string {
-    return __FUNCTION__;
+    $t = $node->getTitle();
+    return Str\format(
+      "![%s](<%s>%s)",
+      $this->renderNodes($node->getDescription()),
+      $node->getSource(),
+      $t === null ? '' : (' "'.$t.'"'),
+    );
   }
 
   <<__Override>>
