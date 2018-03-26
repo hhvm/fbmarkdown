@@ -13,7 +13,7 @@ namespace Facebook\Markdown\Inlines;
 
 use namespace HH\Lib\{C, Str, Vec};
 
-class AutoLinkExtension extends Inline {
+class AutoLinkExtension extends AutoLink {
   // From the GFM spec
   const string DOMAIN = '([a-z0-9_-]+\.)*[a-z0-9-]+\.[a-z0-9]+';
   const string SCHEME = '(http|https|ftp):\/\/';
@@ -68,7 +68,7 @@ class AutoLinkExtension extends Inline {
       list($path, $offset) = self::consumePath($markdown, $offset);
       $text = $prefix.$domain.$path;
       return tuple(
-        new AutoLink($text, 'http://'.$text),
+        new self($text, 'http://'.$text),
         $offset,
       );
     }
@@ -76,14 +76,14 @@ class AutoLinkExtension extends Inline {
       list($path, $offset) = self::consumePath($markdown, $offset);
       $text = $prefix.$domain.$path;
       return tuple(
-        new AutoLink($text, $text),
+        new self($text, $text),
         $offset,
       );
     }
 
     // email
     return tuple(
-      new AutoLink($full, 'mailto:'.$full),
+      new self($full, 'mailto:'.$full),
       $offset,
     );
   }
