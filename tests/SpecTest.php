@@ -94,7 +94,6 @@ final class SpecTest extends TestCase {
     string $expected_html,
     ?string $extension,
   ): void {
-    $this->markTestIncomplete('Still a work in progress');
     $parser_ctx = (new ParserContext())
       ->enableHTML_UNSAFE()
       ->disableExtensions();
@@ -104,16 +103,9 @@ final class SpecTest extends TestCase {
       $parser_ctx->enableNamedExtension($extension);
       $render_ctx->enableNamedExtension($extension);
     }
+
     $ast = parse($parser_ctx, $original_md);
     $normalized_md = (new MarkdownRenderer($render_ctx))->render($ast);
-    print("--- ORIGINAL ---\n");
-    print($original_md."\n");
-    print("--- NORMALIZED ---\n");
-    print($normalized_md."\n");
-    print("--- ORIGINAL AST ---\n");
-    \var_dump($ast);
-    print("--- END ---\n");
-
     $normalized_ast = parse($parser_ctx, $normalized_md);
     $actual_html = (new HTMLRenderer($render_ctx))->render($normalized_ast);
 
