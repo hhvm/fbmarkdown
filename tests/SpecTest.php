@@ -110,15 +110,39 @@ final class SpecTest extends TestCase {
     print($original_md."\n");
     print("--- NORMALIZED ---\n");
     print($normalized_md."\n");
-    print("--- AST ---\n");
+    print("--- ORIGINAL AST ---\n");
     \var_dump($ast);
     print("--- END ---\n");
 
-    $this->assertExampleMatches(
-      $name,
-      $normalized_md,
+    $normalized_ast = parse($parser_ctx, $normalized_md);
+    $actual_html = (new HTMLRenderer($render_ctx))->render($normalized_ast);
+
+    $actual_html = self::normalizeHTML($actual_html);
+    $expected_html = self::normalizeHTML($expected_html);
+
+    expect($actual_html)->toBeSame(
       $expected_html,
-      $extension,
+      "HTML differs for %s:\n%s",
+      $name,
+      $original_md,
     );
+  }
+
+  private static function normalizeHTML(string $html): string {
+    if ($html === '') {
+      return '';
+    }
+    $html = Str\replace($html, "\t", self::TAB_REPLACEMENT);
+    $old = \libxml_use_internal_errors(true);
+    try {
+      $doc = new \DOMDocument();
+      $doc->loadHTML(
+        $html,
+        \LIBXML_NOENT | \LIBXML_HTML_NOIMPLIED | \LIBXML_HTML_NODEFDTD,
+      );
+      return $doc->saveHTML();
+    } finally {
+      \libxml_use_internal_errors($old);
+    }
   }
 }
