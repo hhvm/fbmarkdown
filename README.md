@@ -113,6 +113,6 @@ The Hack and HHVM documentation uses most of these approaches; see:
 
 ## License
 
-FBMarkdown is BSD-licensed. We also provide an additional patent grant.
+FBMarkdown is MIT-licensed.
 
 FBMarkdown may contain third-party software; see [third\_party\_notices.txt](third_party_notices.txt) for details.
