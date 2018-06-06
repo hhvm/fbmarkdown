@@ -2,6 +2,10 @@
 set -ex
 hhvm --version
 
+if [ "$TRAVIS_PHP_VERSION" = 'hhvm-3.24' ]; then
+  cp composer.lock-3.24 composer.lock
+fi
+
 composer install
 
 hh_client
