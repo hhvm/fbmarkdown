@@ -13,10 +13,12 @@ hhvm vendor/bin/phpunit
 hhvm vendor/bin/hhast-lint
 
 # Make sure we pass when a release is required
+SOURCE_DIR=$(pwd)
 EXPORT_DIR=$(mktemp -d)
 git archive --format=tar -o "${EXPORT_DIR}/exported.tar" HEAD
 cd "$EXPORT_DIR"
 tar -xf exported.tar
+cp "${SOURCE_DIR}/composer.lock" .
 composer install --no-dev
 echo > .hhconfig
 hh_server --check $(pwd)
