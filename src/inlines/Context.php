@@ -74,12 +74,23 @@ class Context {
     return $this;
   }
 
+  public function disableNamedExtension(string $name): this {
+    $this->disabledInlineTypes = Keyset\union(
+      $this->disabledInlineTypes,
+      Keyset\filter(
+        self::ALL_INLINE_TYPES,
+        $class ==> Str\ends_with(Str\lowercase($class), "\\".$name.'extension'),
+      ),
+    );
+    return $this;
+  }
+
   public function enableNamedExtension(string $name): this {
     $this->disabledInlineTypes = Keyset\filter(
       $this->disabledInlineTypes,
       $class ==> !Str\ends_with(
         Str\lowercase($class),
-        "\\".$name.'extension',
+        "\\".Str\lowercase($name).'extension',
       ),
     );
     return $this;

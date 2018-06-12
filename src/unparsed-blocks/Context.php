@@ -49,6 +49,20 @@ class Context {
     return $this;
   }
 
+  public function disableNamedExtension(string $name): this {
+    $this->disabledBlockTypes = Keyset\union(
+      $this->disabledBlockTypes,
+      Keyset\filter(
+        self::ALL_BLOCK_TYPES,
+        $class ==> Str\ends_with(
+          Str\lowercase($class),
+          "\\".Str\lowercase($name).'extension',
+        ),
+      ),
+    );
+    return $this;
+  }
+
   public function enableNamedExtension(string $name): this {
     $this->disabledBlockTypes = Keyset\filter(
       $this->disabledBlockTypes,

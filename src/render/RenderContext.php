@@ -34,6 +34,14 @@ class RenderContext {
     return $this;
   }
 
+  public function disableNamedExtension(string $extension): this {
+    $this->enabledExtensions = Vec\filter(
+      $this->enabledExtensions,
+      $obj ==> !Str\ends_with_ci(\get_class($obj), "\\".$extension.'Extension'),
+    );
+    return $this;
+  }
+
   public function enableNamedExtension(string $extension): this {
     $this->enabledExtensions = $this->extensions
       |> Vec\filter(

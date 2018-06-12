@@ -34,6 +34,12 @@ final class ParserContext {
     return $this;
   }
 
+  public function disableNamedExtension(string $name): this {
+    $this->blockContext->disableNamedExtension($name);
+    $this->inlineContext->disableNamedExtension($name);
+    return $this;
+  }
+
   public function enableNamedExtension(string $name): this {
     $this->blockContext->enableNamedExtension($name);
     $this->inlineContext->enableNamedExtension($name);
