@@ -17,6 +17,8 @@ function parse(
   string $markdown,
 ): Document {
   $lines = $markdown
+    |> Str\replace($$, "\r\n", "\n")
+    |> Str\replace($$, "\r", "\n")
     |> Str\split($$, "\n")
     |> (C\lastx($$) === '' ? Vec\slice($$, 0, C\count($$) - 1) : $$)
     |> Vec\map($$, $line ==> tuple(0, $line))

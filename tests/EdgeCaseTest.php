@@ -34,6 +34,21 @@ final class EdgeCaseTest extends TestCase {
         '*foo __bar *baz bim__ bam*',
         "<p><em>foo <strong>bar *baz bim</strong> bam</em></p>\n",
       ),
+      // CR
+      tuple(
+        "CR Foo\x0d\x0d> Bar\x0d\x0dBaz",
+        "<p>CR Foo</p>\n<blockquote>\n<p>Bar</p>\n</blockquote>\n<p>Baz</p>\n",
+      ),
+      // LF
+      tuple(
+        "LF Foo\x0a\x0a> Bar\x0a\x0aBaz",
+        "<p>LF Foo</p>\n<blockquote>\n<p>Bar</p>\n</blockquote>\n<p>Baz</p>\n",
+      ),
+      // CRLF
+      tuple(
+        "CRLF Foo\x0d\x0a\x0d\x0a> Bar\x0d\x0a\x0d\x0aBaz",
+        "<p>CRLF Foo</p>\n<blockquote>\n<p>Bar</p>\n</blockquote>\n<p>Baz</p>\n",
+      ),
     ];
   }
 
