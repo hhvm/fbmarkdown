@@ -11,7 +11,7 @@
     "require-dev": {
         "91carriage/phpunit-hhi": "~5.7",
         "phpunit/phpunit": "~5.7",
-        "facebook/fbexpect": "^0.4.0|^3.26.0",
+        "facebook/fbexpect": "^0.4.0|^1.1.0",
         "hhvm/hhast": "^1.0|^3.26.0"
     }
 }
