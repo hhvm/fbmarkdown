@@ -10,7 +10,7 @@
 
 namespace Facebook\Markdown\UnparsedBlocks;
 
-use namespace HH\Lib\{C, Str, Vec};
+use namespace HH\Lib\Str;
 use type Facebook\Markdown\Blocks\Heading as ASTHeading;
 use namespace Facebook\Markdown\Inlines;
 

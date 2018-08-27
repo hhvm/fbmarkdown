@@ -13,7 +13,7 @@ namespace Facebook\Markdown\UnparsedBlocks;
 use type Facebook\Markdown\Blocks\Heading as ASTHeading;
 use namespace Facebook\Markdown\Inlines;
 
-use namespace HH\Lib\{C, Str, Vec};
+use namespace HH\Lib\Str;
 
 class SetextHeading extends LeafBlock implements BlockProducer {
   public function __construct(private int $level, private string $heading) {

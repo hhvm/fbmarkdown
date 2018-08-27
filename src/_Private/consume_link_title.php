@@ -10,7 +10,7 @@
 
 namespace Facebook\Markdown\_Private;
 
-use namespace HH\Lib\{C, Str, Vec};
+use namespace HH\Lib\{C, Str};
 
 function consume_link_title(string $input): ?(string, int) {
   invariant($input !== '', "Can't consume an empty string");

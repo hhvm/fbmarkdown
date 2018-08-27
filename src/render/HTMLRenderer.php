@@ -118,7 +118,7 @@ class HTMLRenderer extends Renderer<string> {
 
   <<__Override>>
   protected function renderLinkReferenceDefinition(
-    Blocks\LinkReferenceDefinition $def,
+    Blocks\LinkReferenceDefinition $_def,
   ): string {
     return '';
   }
@@ -278,7 +278,7 @@ class HTMLRenderer extends Renderer<string> {
 
   protected function renderTableDataCell(
     Blocks\TableExtension $table,
-    int $row_idx,
+    int $_row_idx,
     int $col_idx,
     Blocks\TableExtension::TCell $cell,
   ): string {

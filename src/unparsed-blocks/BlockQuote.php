@@ -92,7 +92,7 @@ class BlockQuote extends ContainerBlock<Block> implements BlockProducer {
   }
 
   protected static function consumePrefixedChunk(
-    Context $context,
+    Context $_context,
     Lines $lines,
   ): ?(vec<(int, string)>, Lines) {
     $contents = vec[];

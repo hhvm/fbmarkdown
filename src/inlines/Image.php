@@ -10,10 +10,6 @@
 
 namespace Facebook\Markdown\Inlines;
 
-use function Facebook\Markdown\_Private\{
-  consume_link_destination,
-  consume_link_title,
-};
 use namespace HH\Lib\{Str, Vec};
 
 class Image extends Inline {

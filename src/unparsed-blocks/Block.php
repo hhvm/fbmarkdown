@@ -12,7 +12,6 @@ namespace Facebook\Markdown\UnparsedBlocks;
 
 use type Facebook\Markdown\Inlines\Context as InlineContext;
 use type Facebook\Markdown\Blocks\Block as ASTBlock;
-use namespace HH\Lib\Str;
 
 abstract class Block {
   abstract public function withParsedInlines(InlineContext $_): ASTBlock;

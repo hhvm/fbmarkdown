@@ -10,8 +10,6 @@
 
 namespace Facebook\Markdown;
 
-use type Facebook\Markdown\UnparsedBlocks\Context as BlockContext;
-use type Facebook\Markdown\Inlines\Context as InlineContext;
 use type Facebook\Markdown\Blocks\Document as Document;
 
 use namespace HH\Lib\{Str, Vec};

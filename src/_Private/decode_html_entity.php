@@ -10,7 +10,7 @@
 
 namespace Facebook\Markdown\_Private;
 
-use namespace HH\Lib\{C, Str};
+use namespace HH\Lib\Str;
 
 const string UNICODE_REPLACEMENT_CHARACTER = "\u{fffd}";
 

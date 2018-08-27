@@ -12,7 +12,7 @@ namespace Facebook\Markdown\UnparsedBlocks;
 
 use type Facebook\Markdown\Blocks\ThematicBreak as ASTNode;
 use namespace Facebook\Markdown\Inlines;
-use namespace HH\Lib\{C, Str, Vec};
+use namespace HH\Lib\{Str, Vec};
 
 class ThematicBreak extends LeafBlock implements BlockProducer {
 
@@ -39,7 +39,7 @@ class ThematicBreak extends LeafBlock implements BlockProducer {
   }
 
   <<__Override>>
-  public function withParsedInlines(Inlines\Context $context): ASTNode {
+  public function withParsedInlines(Inlines\Context $_context): ASTNode {
     return new ASTNode();
   }
 }

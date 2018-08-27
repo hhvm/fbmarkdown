@@ -10,7 +10,7 @@
 
 namespace Facebook\Markdown\Inlines;
 
-use function \Facebook\Markdown\_Private\decode_html_entity;
+use function Facebook\Markdown\_Private\decode_html_entity;
 use namespace HH\Lib\Str;
 
 class EntityReference extends InlineWithPlainTextContent {

@@ -12,8 +12,7 @@ namespace Facebook\Markdown\UnparsedBlocks;
 
 use type Facebook\Markdown\Blocks\ListOfItems as ASTNode;
 use namespace Facebook\Markdown\Inlines;
-use namespace Facebook\TypeAssert;
-use namespace HH\Lib\{C, Str, Vec};
+use namespace HH\Lib\Vec;
 
 class ListOfItems extends ContainerBlock<ListItem> implements BlockProducer {
   public function __construct(

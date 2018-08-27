@@ -10,7 +10,7 @@
 
 namespace Facebook\Markdown\UnparsedBlocks;
 
-use namespace HH\Lib\{C, Dict, Vec};
+use namespace HH\Lib\Vec;
 
 
 abstract class ContainerBlock<TChild as Block>

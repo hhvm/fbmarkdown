@@ -10,7 +10,7 @@
 
 namespace Facebook\Markdown\Inlines\_Private\StrPos;
 
-use namespace HH\Lib\{C, Str};
+use namespace HH\Lib\Str;
 
 function trim_left(string $in, int $start, string $chars = " \t\n"): int {
   $len = Str\length($in);

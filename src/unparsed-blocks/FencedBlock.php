@@ -10,7 +10,6 @@
 
 namespace Facebook\Markdown\UnparsedBlocks;
 
-use namespace HH\Lib\{C, Vec};
 
 abstract class FencedBlock extends LeafBlock implements BlockProducer {
   protected abstract static function createFromLines(

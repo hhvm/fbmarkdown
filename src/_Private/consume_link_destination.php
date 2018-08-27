@@ -10,7 +10,7 @@
 
 namespace Facebook\Markdown\_Private;
 
-use namespace HH\Lib\{C, Str, Vec};
+use namespace HH\Lib\{C, Str};
 
 function consume_link_destination(string $input): ?(string, int) {
   if ($input[0] === '<') {

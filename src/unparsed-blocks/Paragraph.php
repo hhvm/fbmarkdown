@@ -12,7 +12,7 @@ namespace Facebook\Markdown\UnparsedBlocks;
 
 use type Facebook\Markdown\Blocks\Paragraph as ASTNode;
 use namespace Facebook\Markdown\Inlines;
-use namespace HH\Lib\{C, Str, Vec};
+use namespace HH\Lib\{Str, Vec};
 
 class Paragraph extends LeafBlock implements BlockProducer {
   public function __construct(

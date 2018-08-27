@@ -11,7 +11,7 @@
 namespace Facebook\Markdown\Inlines\_Private;
 
 use namespace Facebook\Markdown\Inlines;
-use namespace HH\Lib\{C, Str, Vec};
+use namespace HH\Lib\{Str, Vec};
 
 function parse_with_blacklist (
   Inlines\Context $context,

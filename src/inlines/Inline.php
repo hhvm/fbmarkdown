@@ -11,7 +11,6 @@
 namespace Facebook\Markdown\Inlines;
 
 use type Facebook\Markdown\ASTNode as ASTNode;
-use namespace HH\Lib\{C, Keyset, Str};
 
 abstract class Inline extends ASTNode {
   abstract public static function consume(

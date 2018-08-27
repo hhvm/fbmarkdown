@@ -11,7 +11,7 @@
 namespace Facebook\Markdown\Inlines;
 
 use type Facebook\Markdown\UnparsedBlocks\HTMLBlock;
-use namespace HH\Lib\{C, Str};
+use namespace HH\Lib\Str;
 
 <<__ConsistentConstruct>>
 class RawHTML extends Inline {

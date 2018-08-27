@@ -16,7 +16,7 @@ use function Facebook\Markdown\_Private\{
   consume_link_title,
 };
 use namespace Facebook\Markdown\Inlines;
-use namespace HH\Lib\{C, Str, Vec};
+use namespace HH\Lib\Str;
 
 class LinkReferenceDefinition extends LeafBlock implements BlockProducer {
   public function __construct(

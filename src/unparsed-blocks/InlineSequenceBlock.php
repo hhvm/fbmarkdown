@@ -12,7 +12,6 @@ namespace Facebook\Markdown\UnparsedBlocks;
 
 use type Facebook\Markdown\Blocks\InlineSequenceBlock as ASTNode;
 use namespace Facebook\Markdown\Inlines;
-use namespace HH\Lib\Vec;
 
 /**  Not used by the core engine; useful for extensions when a block-level
  * extension wants to produce inlines. */

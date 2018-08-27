@@ -11,7 +11,7 @@
 namespace Facebook\Markdown\UnparsedBlocks;
 
 use namespace Facebook\Markdown\{Blocks, Inlines};
-use namespace HH\Lib\{C, Str, Vec};
+use namespace HH\Lib\{Str, Vec};
 
 class TaskListItemExtension extends ListItem {
   public function __construct(

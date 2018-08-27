@@ -15,7 +15,7 @@ use namespace HH\Lib\Str;
 class TagFilterExtension extends RenderFilter {
   <<__Override>>
   public function filter(
-    RenderContext $context,
+    RenderContext $_context,
     ASTNode $node,
   ): vec<ASTNode> {
     if ($node instanceof Blocks\HTMLBlock) {

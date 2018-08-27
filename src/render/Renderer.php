@@ -10,7 +10,7 @@
 
 namespace Facebook\Markdown;
 
-use namespace HH\Lib\{C, Str, Vec};
+use namespace HH\Lib\C;
 
 abstract class Renderer<T> {
   public function __construct(

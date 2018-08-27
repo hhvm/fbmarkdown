@@ -10,7 +10,6 @@
 
 namespace Facebook\Markdown\Blocks;
 
-use namespace HH\Lib\{C, Vec};
 
 abstract class ContainerBlock extends Block {
   public function __construct(

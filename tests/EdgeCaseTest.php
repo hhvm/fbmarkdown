@@ -10,8 +10,6 @@
 
 namespace Facebook\Markdown;
 
-use namespace Facebook\TypeAssert;
-use namespace HH\Lib\{C, Str, Vec};
 
 use function Facebook\FBExpect\expect;
 
