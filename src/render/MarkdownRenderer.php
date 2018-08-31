@@ -13,7 +13,7 @@ namespace Facebook\Markdown;
 use type Facebook\Markdown\Blocks\TableExtensionColumnAlignment;
 use namespace HH\Lib\{C, Math, Str, Vec};
 
-/** Re-create Markdwon from the AST */
+/** Re-create Markdown from the AST */
 class MarkdownRenderer extends Renderer<string> {
   private ?string $outContext = null;
 

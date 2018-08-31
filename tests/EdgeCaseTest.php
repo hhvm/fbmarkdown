@@ -19,6 +19,14 @@ final class EdgeCaseTest extends TestCase {
     return [
       tuple("- foo\n\n", "<ul>\n<li>foo</li>\n</ul>\n"),
       tuple("- foo\n\n\n", "<ul>\n<li>foo</li>\n</ul>\n"),
+      tuple(
+        "foo|bar\n---|---\n`\|\|`|herp\n",
+        "<table>\n<thead>\n".
+        "<tr>\n<th>foo</th>\n<th>bar</th>\n</tr>\n".
+        "</thead>\n<tbody>\n".
+        "<tr>\n<td><code>||</code></td>\n<td>herp</td>\n</tr>".
+        "</tbody></table>\n"
+      ),
       // Already covered in the spec, but emphasizing here as they
       // illustrate correct binding for the next problme
       tuple('**foo*', "<p>*<em>foo</em></p>\n"),
@@ -59,7 +67,7 @@ final class EdgeCaseTest extends TestCase {
       'unnamed',
       $in,
       $expected_html,
-      null,
+      /* extension = */ 'table',
     );
   }
 

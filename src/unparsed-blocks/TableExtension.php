@@ -146,7 +146,8 @@ class TableExtension extends LeafBlock implements BlockProducer {
         $parts[] = Str\slice($first, $start);
         break;
       }
-      if ($end >> 1 && $first[$end - 1] === '\\') {
+
+      while ($end !== null && $end > 1 && $first[(int) $end - 1] === '\\') {
         $end = Str\search($first, '|', $end + 1);
       }
 
