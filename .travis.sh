@@ -10,7 +10,10 @@ composer install
 
 hh_client
 hhvm vendor/bin/phpunit
-hhvm vendor/bin/hhast-lint
+
+if !(hhvm --version | grep -q -- -dev); then
+  hhvm vendor/bin/hhast-lint
+fi
 
 # Make sure we pass when a release is required
 SOURCE_DIR=$(pwd)
