@@ -13,7 +13,7 @@ namespace Facebook\Markdown;
 use namespace HH\Lib\Str;
 use function Facebook\FBExpect\expect;
 
-abstract class TestCase extends \PHPUnit\Framework\TestCase {
+abstract class TestCase extends \Facebook\HackTest\HackTestCase {
   const string TAB_REPLACEMENT = "\u{2192}";
 
   final protected function assertExampleMatches(

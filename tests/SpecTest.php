@@ -78,13 +78,12 @@ final class SpecTest extends TestCase {
   ): void {
     $this->assertExampleMatches($name, $in, $expected_html, $extension);
   }
-
+  <<DataProvider('getSpecExamples')>>
   /** Parse markdown to an AST, re-serialize it to markdown, then re-parse and
    * finally render to HTML, and check that matches.
    *
    * This is basically a test of `MarkdownRenderer`.
    *
-   * @dataProvider getSpecExamples
    */
   public function testSpecExampleNormalizesWithoutHTMLChange(
     string $name,
