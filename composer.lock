@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "532876dc8b6610b0f310f4bddc863c14",
+    "content-hash": "b958b1be943b59ad475eb432ee1ac1c2",
     "packages": [
         {
             "name": "hhvm/hhvm-autoload",
@@ -384,6 +384,8 @@
     "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
-    "platform": [],
+    "platform": {
+        "hhvm": "^3.28"
+    },
     "platform-dev": []
 }

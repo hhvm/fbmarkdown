@@ -9,6 +9,7 @@
       }
     },
     "require": {
+        "hhvm": "^3.28",
         "hhvm/hhvm-autoload": "^1.5",
         "hhvm/hsl": "^1.1|^3.26.0",
         "hhvm/type-assert": "^3.1"
