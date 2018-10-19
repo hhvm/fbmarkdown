@@ -52,7 +52,7 @@ class ListItem extends ContainerBlock<Block> implements BlockProducer {
   ): ?(ListItem, Lines) {
     $max_indent = $context->getContext(self::MAX_INDENT_CONTEXT);
     invariant(
-      \is_int($max_indent),
+      $max_indent is int,
       'expected to get a maximum indentation from context, got a %s',
       \gettype($max_indent),
     );

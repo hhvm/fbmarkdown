@@ -12,6 +12,7 @@ namespace Facebook\Markdown;
 
 use namespace HH\Lib\{C, Str};
 
+use type Facebook\HackTest\DataProvider;
 use function Facebook\FBExpect\expect;
 
 final class SpecTest extends TestCase {
@@ -69,7 +70,7 @@ final class SpecTest extends TestCase {
     return $examples;
   }
 
-  /** @dataProvider getSpecExamples */
+  <<DataProvider('getSpecExamples')>>
   public function testSpecExample(
     string $name,
     string $in,

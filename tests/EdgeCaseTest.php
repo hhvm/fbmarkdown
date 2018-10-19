@@ -10,7 +10,7 @@
 
 namespace Facebook\Markdown;
 
-
+use type Facebook\HackTest\DataProvider;
 use function Facebook\FBExpect\expect;
 
 final class EdgeCaseTest extends TestCase {
@@ -58,7 +58,7 @@ final class EdgeCaseTest extends TestCase {
     ];
   }
 
-  /** @dataProvider getManualExamples */
+  <<DataProvider('getManualExamples')>>
   public function testManualExample(
     string $in,
     string $expected_html,
