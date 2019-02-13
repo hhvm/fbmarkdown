@@ -17,6 +17,6 @@
         "hhvm/hacktest": "^1.0",
         "hhvm/hhvm-autoload": "^2.0",
         "facebook/fbexpect": "^2.1.0",
-        "hhvm/hhast": "^3.26.0"
+        "hhvm/hhast": "^4.0"
     }
 }
