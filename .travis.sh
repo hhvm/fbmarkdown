@@ -1,27 +1,18 @@
 #!/bin/sh
 set -ex
+apt update -y
+DEBIAN_FRONTEND=noninteractive apt install -y php-cli zip unzip
 hhvm --version
+php --version
 
-if [ "$TRAVIS_PHP_VERSION" = 'hhvm-3.24' ]; then
-  cp composer.lock-3.24 composer.lock
-fi
-
+(
+  cd $(mktemp -d)
+  curl https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+)
 composer install
 
 hh_client
 hhvm vendor/bin/hacktest tests/
-
 if !(hhvm --version | grep -q -- -dev); then
   hhvm vendor/bin/hhast-lint
 fi
-
-# Make sure we pass when a release is required
-SOURCE_DIR=$(pwd)
-EXPORT_DIR=$(mktemp -d)
-git archive --format=tar -o "${EXPORT_DIR}/exported.tar" HEAD
-cd "$EXPORT_DIR"
-tar -xf exported.tar
-cp "${SOURCE_DIR}/composer.lock" .
-composer install --no-dev
-echo > .hhconfig
-hh_server --check $(pwd)
