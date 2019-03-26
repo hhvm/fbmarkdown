@@ -196,15 +196,16 @@ class MarkdownRenderer extends Renderer<string> {
       |> $sep.$$;
   }
 
+  // Used to rotate between separators
   private int $numberOfLists = 0;
 
   <<__Override>>
   protected function renderListOfItems(Blocks\ListOfItems $node): string {
-    ++$this->numberOfLists;
+    $this_list = ++$this->numberOfLists;
     return $node->getItems()
       |> Vec\map(
         $$,
-        $item ==> $this->renderListItem($this->numberOfLists, $node, $item),
+        $item ==> $this->renderListItem($this_list, $node, $item),
       )
       |> Str\join($$, "\n");
   }
