@@ -1,4 +1,5 @@
 assume_php=false
+disable_static_local_variables = true
 ignored_paths = [ "vendor/.+/tests/.+" ]
 disallow_elvis_space=true
 disallow_non_arraykey_keys=true

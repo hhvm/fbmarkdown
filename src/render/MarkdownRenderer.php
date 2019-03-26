@@ -107,11 +107,7 @@ class MarkdownRenderer extends Renderer<string> {
     // reference definitions when constructing the AST; keeping them in case
     // this is mixed with other markdown, or if we end up creating a separate
     // ReferenceLink AST node that renderers need to deal with.
-    $md = \sprintf(
-      '[%s]: <%s>',
-      $def->getLabel(),
-      $def->getDestination(),
-    );
+    $md = \sprintf('[%s]: <%s>', $def->getLabel(), $def->getDestination());
     $title = $def->getTitle();
     if ($title === null) {
       return $md;
@@ -171,23 +167,23 @@ class MarkdownRenderer extends Renderer<string> {
 
     if ($list->isLoose()) {
       $content = $item->getChildren()
-       |> $this->renderNodes($$)
-       |> $$."\n";
+        |> $this->renderNodes($$)
+        |> $$."\n";
     } else {
       $content = $item->getChildren()
         |> Vec\map(
           $$,
           $child ==> {
-          if ($child instanceof Blocks\Paragraph) {
-            return $this->renderNodes($child->getContents());
-          }
-          if ($child instanceof Blocks\Block) {
-            return Str\trim($this->render($child));
-          }
-          return $this->render($child);
-        },
-      )
-      |> Str\join($$, "\n");
+            if ($child instanceof Blocks\Paragraph) {
+              return $this->renderNodes($child->getContents());
+            }
+            if ($child instanceof Blocks\Block) {
+              return Str\trim($this->render($child));
+            }
+            return $this->render($child);
+          },
+        )
+        |> Str\join($$, "\n");
     }
     return $content
       |> Str\split($$, "\n")
@@ -200,12 +196,16 @@ class MarkdownRenderer extends Renderer<string> {
       |> $sep.$$;
   }
 
+  private int $numberOfLists = 0;
+
   <<__Override>>
   protected function renderListOfItems(Blocks\ListOfItems $node): string {
-    static $list_count = 0;
-    ++$list_count;
+    ++$this->numberOfLists;
     return $node->getItems()
-      |> Vec\map($$, $item ==> $this->renderListItem($list_count, $node, $item))
+      |> Vec\map(
+        $$,
+        $item ==> $this->renderListItem($this->numberOfLists, $node, $item),
+      )
       |> Str\join($$, "\n");
   }
 
@@ -322,7 +322,7 @@ class MarkdownRenderer extends Renderer<string> {
   <<__Override>>
   protected function renderCodeSpan(Inlines\CodeSpan $node): string {
     $code = $node->getCode();
-    $len = Str\length((string) $this->outContext) + Str\length($code);
+    $len = Str\length((string)$this->outContext) + Str\length($code);
 
     $sep = '`';
     for ($sep_len = 1; $sep_len <= $len + 1; ++$sep_len) {
@@ -330,7 +330,7 @@ class MarkdownRenderer extends Renderer<string> {
       if (Str\contains($code, $sep)) {
         continue;
       }
-      if (Str\contains((string) $this->outContext, $sep)) {
+      if (Str\contains((string)$this->outContext, $sep)) {
         continue;
       }
       break;
@@ -399,7 +399,9 @@ class MarkdownRenderer extends Renderer<string> {
   }
 
   <<__Override>>
-  protected function renderStrikethroughExtension(Inlines\StrikethroughExtension $node): string {
+  protected function renderStrikethroughExtension(
+    Inlines\StrikethroughExtension $node,
+  ): string {
     $children = $node->getChildren()
       |> Vec\map($$, $child ==> $this->render($child))
       |> Str\join($$, '');
