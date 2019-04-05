@@ -57,6 +57,7 @@ by default as a security precaution.
 ```Hack
 $ctx = (new Markdown\ParserContext())->enableHTML_UNSAFE();
 $ast = Markdown\parse($ctx, $markdown);
+
 // using `Facebook\Markdown\Environment`
 
 $unsafe = true;
