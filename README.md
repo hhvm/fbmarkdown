@@ -43,6 +43,12 @@ function render(string $markdown): string {
 
   return $html;
 }
+
+// or simply
+
+function render(string $markdown): string {
+  return Markdown\Environment::html()->convert($markdown);
+}
 ```
 
 For complete compatibility with GitHub Flavored Markdown, support for embedded HTML must be enabled; it is disabled
@@ -51,6 +57,11 @@ by default as a security precaution.
 ```Hack
 $ctx = (new Markdown\ParserContext())->enableHTML_UNSAFE();
 $ast = Markdown\parse($ctx, $markdown);
+// using `Facebook\Markdown\Environment`
+
+$unsafe = true;
+$environment = Markdown\Environment::html($unsafe);
+$ast = $environment->parse($markdown);
 ```
 
 If you are re-using contexts to render multiple independent snippets, you will need to call `->resetFileData()` on the context.
