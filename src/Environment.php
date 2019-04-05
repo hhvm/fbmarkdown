@@ -21,7 +21,7 @@ final class Environment<T> {
     $parser = new ParserContext();
     $context = new RenderContext();
     $renderer = new HTMLRenderer($context);
-    
+
     if ($unsafe) {
         $parser->enableHTML_UNSAFE();
     }
