@@ -2,3 +2,4 @@ vendor/
 *.swp
 *~
 *.orig
+composer.lock
