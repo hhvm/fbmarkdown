@@ -10,8 +10,10 @@
 
 namespace Facebook\Markdown\UnparsedBlocks;
 
-use type Facebook\Markdown\Blocks\TableExtension as ASTTableExtension;
-use type Facebook\Markdown\Blocks\TableExtensionColumnAlignment as ColumnAlignment;
+use type Facebook\Markdown\Blocks\{
+  TableExtension as ASTTableExtension,
+  TableExtensionColumnAlignment as ColumnAlignment,
+};
 use namespace Facebook\Markdown\Inlines;
 use namespace HH\Lib\{C, Str, Vec};
 
