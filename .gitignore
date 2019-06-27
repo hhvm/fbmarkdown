@@ -3,3 +3,4 @@ vendor/
 *~
 *.orig
 composer.lock
+.*.hhast.*cache
