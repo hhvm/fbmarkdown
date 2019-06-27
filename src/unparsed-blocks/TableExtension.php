@@ -11,8 +11,8 @@
 namespace Facebook\Markdown\UnparsedBlocks;
 
 use type Facebook\Markdown\Blocks\{
-  TableExtension as ASTTableExtension,
   TableExtensionColumnAlignment as ColumnAlignment,
+  TableExtension as ASTTableExtension,
 };
 use namespace Facebook\Markdown\Inlines;
 use namespace HH\Lib\{C, Str, Vec};
