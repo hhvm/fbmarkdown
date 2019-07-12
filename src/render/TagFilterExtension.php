@@ -18,10 +18,10 @@ class TagFilterExtension extends RenderFilter {
     RenderContext $_context,
     ASTNode $node,
   ): vec<ASTNode> {
-    if ($node instanceof Blocks\HTMLBlock) {
+    if ($node is Blocks\HTMLBlock) {
       return vec[$this->filterHTMLBlock($node)];
     }
-    if ($node instanceof Inlines\RawHTML) {
+    if ($node is Inlines\RawHTML) {
       return vec[$this->filterInlineHTML($node)];
     }
     return vec[$node];

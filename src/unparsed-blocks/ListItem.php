@@ -43,7 +43,7 @@ class ListItem extends ContainerBlock<Block> implements BlockProducer {
   }
 
   public function makesListLoose(): bool {
-    return C\any($this->children, $child ==> $child instanceof BlankLine);
+    return C\any($this->children, $child ==> $child is BlankLine);
   }
 
   public static function consume(

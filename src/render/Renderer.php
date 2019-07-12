@@ -70,61 +70,61 @@ abstract class Renderer<T> {
   protected function renderResolvedNode(
     ASTNode $node,
   ): T {
-    if ($node instanceof Blocks\BlankLine) {
+    if ($node is Blocks\BlankLine) {
       return $this->renderBlankLine();
     }
 
-    if ($node instanceof Blocks\BlockQuote) {
+    if ($node is Blocks\BlockQuote) {
       return $this->renderBlockQuote($node);
     }
 
-    if ($node instanceof Blocks\BlockSequence) {
+    if ($node is Blocks\BlockSequence) {
       return $this->renderNodes($node->getChildren());
     }
 
-    if ($node instanceof Blocks\Document) {
+    if ($node is Blocks\Document) {
       return $this->renderDocument($node);
     }
 
     // Blocks\FencedCodeBlock
     // Blocks\IndentedCodeBlock
-    if ($node instanceof Blocks\CodeBlock) {
+    if ($node is Blocks\CodeBlock) {
       return $this->renderCodeBlock($node);
     }
 
-    if ($node instanceof Blocks\Heading) {
+    if ($node is Blocks\Heading) {
       return $this->renderHeading($node);
     }
 
-    if ($node instanceof Blocks\HTMLBlock) {
+    if ($node is Blocks\HTMLBlock) {
       return $this->renderHTMLBlock($node);
     }
 
-    if ($node instanceof Blocks\InlineSequenceBlock) {
+    if ($node is Blocks\InlineSequenceBlock) {
       return $this->renderNodes($node->getChildren());
     }
 
-    if ($node instanceof Blocks\LinkReferenceDefinition) {
+    if ($node is Blocks\LinkReferenceDefinition) {
       return $this->renderLinkReferenceDefinition($node);
     }
 
-    if ($node instanceof Blocks\ListOfItems) {
+    if ($node is Blocks\ListOfItems) {
       return $this->renderListOfItems($node);
     }
 
-    if ($node instanceof Blocks\Paragraph) {
+    if ($node is Blocks\Paragraph) {
       return $this->renderParagraph($node);
     }
 
-    if ($node instanceof Blocks\TableExtension) {
+    if ($node is Blocks\TableExtension) {
       return $this->renderTableExtension($node);
     }
 
-    if ($node instanceof Blocks\ThematicBreak) {
+    if ($node is Blocks\ThematicBreak) {
       return $this->renderThematicBreak();
     }
 
-    if ($node instanceof Inlines\AutoLink) {
+    if ($node is Inlines\AutoLink) {
       return $this->renderAutoLink($node);
     }
 
@@ -132,43 +132,43 @@ abstract class Renderer<T> {
     // Inlines\DisallowedRawHTML
     // Inlines\EntityReference
     // Inlines\TextualContent
-    if ($node instanceof Inlines\InlineWithPlainTextContent) {
+    if ($node is Inlines\InlineWithPlainTextContent) {
       return $this->renderInlineWithPlainTextContent($node);
     }
 
-    if ($node instanceof Inlines\CodeSpan) {
+    if ($node is Inlines\CodeSpan) {
       return $this->renderCodeSpan($node);
     }
 
-    if ($node instanceof Inlines\Emphasis) {
+    if ($node is Inlines\Emphasis) {
       return $this->renderEmphasis($node);
     }
 
-    if ($node instanceof Inlines\HardLineBreak) {
+    if ($node is Inlines\HardLineBreak) {
       return $this->renderHardLineBreak();
     }
 
-    if ($node instanceof Inlines\Image) {
+    if ($node is Inlines\Image) {
       return $this->renderImage($node);
     }
 
-    if ($node instanceof Inlines\InlineSequence) {
+    if ($node is Inlines\InlineSequence) {
       return $this->renderNodes($node->getChildren());
     }
 
-    if ($node instanceof Inlines\Link) {
+    if ($node is Inlines\Link) {
       return $this->renderLink($node);
     }
 
-    if ($node instanceof Inlines\RawHTML) {
+    if ($node is Inlines\RawHTML) {
       return $this->renderRawHTML($node);
     }
 
-    if ($node instanceof Inlines\SoftLineBreak) {
+    if ($node is Inlines\SoftLineBreak) {
       return $this->renderSoftLineBreak();
     }
 
-    if ($node instanceof Inlines\StrikethroughExtension) {
+    if ($node is Inlines\StrikethroughExtension) {
       return $this->renderStrikethroughExtension($node);
     }
 

@@ -190,7 +190,7 @@ class Emphasis extends Inline {
       $position = $closer_idx;
       $closer = $stack[$closer_idx];
       invariant(
-        $closer instanceof Stack\DelimiterNode,
+        $closer is Stack\DelimiterNode,
         'closer must be a delimiter',
       );
       list($closer_text, $closer_flags) = tuple(
@@ -203,7 +203,7 @@ class Emphasis extends Inline {
       $bottom = $openers_bottom[$char][$closer_len];
       for ($i = $position - 1; $i >= $bottom; $i--) {
         $item = $stack[$i];
-        if (!$item instanceof Stack\DelimiterNode) {
+        if (!$item is Stack\DelimiterNode) {
           continue;
         }
         if (!($item->getFlags() & self::IS_START)) {
@@ -329,7 +329,7 @@ class Emphasis extends Inline {
     $offset = C\find_key(
       $in,
       $item ==>
-        $item instanceof Stack\DelimiterNode
+        $item is Stack\DelimiterNode
         && $item->getFlags() & self::IS_END,
     );
     if ($offset === null) {
@@ -493,6 +493,6 @@ class Emphasis extends Inline {
       Str\slice($markdown, 0, $offset),
     );
 
-    return C\last($previous) instanceof BackslashEscape;
+    return C\last($previous) is BackslashEscape;
   }
 }

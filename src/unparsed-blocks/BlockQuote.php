@@ -61,10 +61,10 @@ class BlockQuote extends ContainerBlock<Block> implements BlockProducer {
   protected static function endsWithParagraph(
     Block $block,
   ): bool {
-    if ($block instanceof Paragraph) {
+    if ($block is Paragraph) {
       return true;
     }
-    if ($block instanceof ContainerBlock) {
+    if ($block is ContainerBlock<_>) {
       $last = C\lastx($block->getChildren());
       return self::endsWithParagraph($last);
     }

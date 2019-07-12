@@ -38,7 +38,7 @@ extends Block {
         \get_class($child),
         $lines->getFirstLine(),
       );
-      if ($child instanceof BlockSequence) {
+      if ($child is BlockSequence) {
         $children = Vec\concat($children, $child->getChildren());
       } else {
         $children[] = $child;

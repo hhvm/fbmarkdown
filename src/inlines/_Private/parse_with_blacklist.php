@@ -45,7 +45,7 @@ function parse_with_blacklist (
       \get_class($inline),
     );
     $offset = $new_offset;
-    if ($inline instanceof Inlines\InlineSequence) {
+    if ($inline is Inlines\InlineSequence) {
       $out = Vec\concat($out, $inline->getChildren());
     } else {
       $out[] = $inline;

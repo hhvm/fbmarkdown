@@ -29,7 +29,7 @@ class MarkdownRenderer extends Renderer<string> {
         $$,
         $node ==> {
           $content = $this->render($node);
-          if ($node instanceof Blocks\Block) {
+          if ($node is Blocks\Block) {
             $content = $content."\n\n";
           }
           $this->outContext .= $content;
@@ -161,7 +161,7 @@ class MarkdownRenderer extends Renderer<string> {
     }
     $leading = Str\length($sep);
 
-    if ($item instanceof Blocks\TaskListItemExtension) {
+    if ($item is Blocks\TaskListItemExtension) {
       $sep .= \sprintf('[%s] ', $item->isChecked() ? 'x' : ' ');
     }
 
@@ -174,10 +174,10 @@ class MarkdownRenderer extends Renderer<string> {
         |> Vec\map(
           $$,
           $child ==> {
-            if ($child instanceof Blocks\Paragraph) {
+            if ($child is Blocks\Paragraph) {
               return $this->renderNodes($child->getContents());
             }
-            if ($child instanceof Blocks\Block) {
+            if ($child is Blocks\Block) {
               return Str\trim($this->render($child));
             }
             return $this->render($child);
@@ -219,7 +219,7 @@ class MarkdownRenderer extends Renderer<string> {
         $$,
         $line ==> {
           $parsed = UnparsedBlocks\parse($ctx, $line)->getChildren();
-          if (!C\firstx($parsed) instanceof UnparsedBlocks\Paragraph) {
+          if (!C\firstx($parsed) is UnparsedBlocks\Paragraph) {
             return "    ".$line;
           }
           if (\preg_match('/^ {0,3}[=-]+ *$/', $line)) {
@@ -293,7 +293,7 @@ class MarkdownRenderer extends Renderer<string> {
 
   <<__Override>>
   protected function renderAutoLink(Inlines\AutoLink $node): string {
-    if ($node instanceof Inlines\AutoLinkExtension) {
+    if ($node is Inlines\AutoLinkExtension) {
       return $node->getText();
     }
     return '<'.$node->getText().'>';
@@ -303,10 +303,10 @@ class MarkdownRenderer extends Renderer<string> {
   protected function renderInlineWithPlainTextContent(
     Inlines\InlineWithPlainTextContent $node,
   ): string {
-    if ($node instanceof Inlines\BackslashEscape) {
+    if ($node is Inlines\BackslashEscape) {
       return "\\".$node->getContent();
     }
-    if ($node instanceof Inlines\EntityReference) {
+    if ($node is Inlines\EntityReference) {
       // This matters if the entity reference is for whitespace: if we print
       // it out raw, we might accidentally create an indented code block, or
       // continue a more deeply nested block than we should.

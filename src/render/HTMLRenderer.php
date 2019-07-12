@@ -70,7 +70,7 @@ class HTMLRenderer extends Renderer<string> {
 
   <<__Override>>
   protected function renderResolvedNode(ASTNode $node): string {
-    if ($node instanceof RenderableAsHTML) {
+    if ($node is RenderableAsHTML) {
       return $node->renderAsHTML($this->getContext(), $this);
     }
     return parent::renderResolvedNode($node);
@@ -132,7 +132,7 @@ class HTMLRenderer extends Renderer<string> {
 
     $children = $item->getChildren();
     $first = C\first($children);
-    if ($first instanceof Blocks\Paragraph) {
+    if ($first is Blocks\Paragraph) {
       $children[0] = new Blocks\Paragraph(
         Vec\concat(
           vec[new Inlines\RawHTML($checkbox)],
@@ -159,7 +159,7 @@ class HTMLRenderer extends Renderer<string> {
     Blocks\ListOfItems $list,
     Blocks\ListItem $item,
   ): string {
-    if ($item instanceof Blocks\TaskListItemExtension) {
+    if ($item is Blocks\TaskListItemExtension) {
       return $this->renderTaskListItemExtension($list, $item);
     }
 
@@ -171,7 +171,7 @@ class HTMLRenderer extends Renderer<string> {
     $content = '';
 
     if ($list->isTight()) {
-      if (!C\first($children) instanceof Blocks\Paragraph) {
+      if (!C\first($children) is Blocks\Paragraph) {
         $content .= "\n";
       }
 
@@ -179,17 +179,17 @@ class HTMLRenderer extends Renderer<string> {
         |> Vec\map(
           $$,
           $child ==> {
-            if ($child instanceof Blocks\Paragraph) {
+            if ($child is Blocks\Paragraph) {
               return $this->renderNodes($child->getContents());
             }
-            if ($child instanceof Blocks\Block) {
+            if ($child is Blocks\Block) {
               return Str\trim($this->render($child));
             }
             return $this->render($child);
           },
         )
         |> Str\join($$, "\n");
-      if (!C\last($children) instanceof Blocks\Paragraph) {
+      if (!C\last($children) is Blocks\Paragraph) {
         $content .= "\n";
       }
     } else {
