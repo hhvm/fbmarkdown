@@ -201,7 +201,8 @@ class MarkdownRenderer extends Renderer<string> {
 
   <<__Override>>
   protected function renderListOfItems(Blocks\ListOfItems $node): string {
-    $this_list = ++$this->numberOfLists;
+    $this->numberOfLists++;
+    $this_list = $this->numberOfLists;
     return $node->getItems()
       |> Vec\map(
         $$,
