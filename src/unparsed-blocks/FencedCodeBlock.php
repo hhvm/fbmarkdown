@@ -14,11 +14,10 @@ use const Facebook\Markdown\_Private\ASCII_PUNCTUATION;
 use function Facebook\Markdown\_Private\decode_html_entity;
 use type Facebook\Markdown\Blocks\FencedCodeBlock as ASTNode;
 use namespace Facebook\Markdown\Inlines;
-use namespace HH\Lib\{C, Str, Vec};
+use namespace HH\Lib\{C, Regex, Str, Vec};
 
 <<__ConsistentConstruct>>
 class FencedCodeBlock extends FencedBlock {
-  const string PATTERN = '/^(?<indent> {0,3})(?<fence>`{3,}|~{3,})(?<info>[^`]*)?$/';
 
   public function __construct(
     private string $content,
@@ -34,6 +33,13 @@ class FencedCodeBlock extends FencedBlock {
     return $this->infoString;
   }
 
+  private static function getPattern(
+  ): Regex\Pattern<
+    shape('indent' => string, 'fence' => string, 'info' => string, ...),
+  > {
+    return re"/^(?<indent> {0,3})(?<fence>`{3,}|~{3,})(?<info>[^`]*)?$/";
+  }
+
   <<__Override>>
   protected static function createFromLines(
     vec<string> $lines,
@@ -41,11 +47,8 @@ class FencedCodeBlock extends FencedBlock {
     bool $eof,
   ): this {
     $first = C\firstx($lines);
-    $matches = [];
-    invariant(
-      \preg_match(self::PATTERN, $first, &$matches) === 1,
-      'Invalid first line',
-    );
+    $matches = Regex\first_match($first, self::getPattern());
+    invariant($matches is nonnull, 'Invalid first line');
     $info = Str\trim($matches['info'] ?? '');
     if ($info === '') {
       $info = null;
@@ -109,9 +112,8 @@ class FencedCodeBlock extends FencedBlock {
     int $_column,
     string $first,
   ): ?string {
-    $matches = [];
-    $result = \preg_match(self::PATTERN, $first, &$matches);
-    if ($result !== 1) {
+    $matches = Regex\first_match($first, self::getPattern());
+    if ($matches is null) {
       return null;
     }
     return '/^ {0,3}'.$matches['fence'].'+ *$/';

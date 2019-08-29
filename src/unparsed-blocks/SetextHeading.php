@@ -13,7 +13,7 @@ namespace Facebook\Markdown\UnparsedBlocks;
 use type Facebook\Markdown\Blocks\Heading as ASTHeading;
 use namespace Facebook\Markdown\Inlines;
 
-use namespace HH\Lib\Str;
+use namespace HH\Lib\{Regex, Str};
 
 class SetextHeading extends LeafBlock implements BlockProducer {
   public function __construct(private int $level, private string $heading) {
@@ -36,8 +36,8 @@ class SetextHeading extends LeafBlock implements BlockProducer {
         return null;
       }
 
-      $matches = [];
-      if (\preg_match('/^ {0,3}(?<level>=+|-+) *$/', $line, &$matches) === 1) {
+      $matches = Regex\first_match($line, re"/^ {0,3}(?<level>=+|-+) *$/");
+      if ($matches is nonnull) {
         // Heading underline can not be a lazy continuation item
         if ($col >= $first_col) {
           $level = $matches['level'][0] === '=' ? 1 : 2;

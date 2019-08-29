@@ -11,7 +11,7 @@
 namespace Facebook\Markdown\Inlines;
 
 use namespace Facebook\Markdown\Inlines\_Private\EmphasisStack as Stack;
-use namespace HH\Lib\{C, Str, Vec};
+use namespace HH\Lib\{C, Regex, Str, Vec};
 
 class Emphasis extends Inline {
   const string UNICODE_WHITESPACE = "[\\pZ\u{0009}\u{000d}\u{000a}\u{000c}]";
@@ -343,8 +343,7 @@ class Emphasis extends Inline {
     int $offset,
   ): (string, int) {
     $slice = Str\slice($markdown, $offset);
-    $matches = [];
-    \preg_match('/^(\\*+|_+)/', $slice, &$matches);
+    $matches = Regex\first_match($slice, re"/^(\\*+|_+)/") as nonnull;
     $match = $matches[0];
     return tuple($match, $offset + Str\length($match));
   }

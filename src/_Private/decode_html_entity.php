@@ -10,7 +10,7 @@
 
 namespace Facebook\Markdown\_Private;
 
-use namespace HH\Lib\Str;
+use namespace HH\Lib\{Regex, Str};
 
 const string UNICODE_REPLACEMENT_CHARACTER = "\u{fffd}";
 
@@ -19,17 +19,13 @@ function decode_html_entity(string $string): ?(string, string, string) {
     return null;
   }
 
-  $matches = [];
-  if (
-    \preg_match(
-      '/^&(#[0-9]{1,8}|#X[0-9a-f]{1,8}|[a-z][a-z0-9]*);/i',
-      $string,
-      &$matches,
-    ) !== 1
-  ) {
+  $matches = Regex\first_match(
+    $string,
+    re"/^&(#[0-9]{1,8}|#X[0-9a-f]{1,8}|[a-z][a-z0-9]*);/i",
+  );
+  if ($matches is null) {
     return null;
   }
-
   $match = $matches[0];
 
   $table = get_html_entity_table();

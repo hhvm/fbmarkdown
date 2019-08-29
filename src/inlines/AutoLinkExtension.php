@@ -10,7 +10,7 @@
 
 namespace Facebook\Markdown\Inlines;
 
-use namespace HH\Lib\{C, Str, Vec};
+use namespace HH\Lib\{C, Regex, Str, Vec};
 
 class AutoLinkExtension extends AutoLink {
   // From the GFM spec
@@ -44,10 +44,10 @@ class AutoLinkExtension extends AutoLink {
     $string = Str\slice($markdown, $offset);
 
     $matches = [];
-    $result = \preg_match(
+    $result = \preg_match_with_matches(
       '/^(?<prefix>'.self::PREFIX.')(?<domain>'.self::DOMAIN.')/i',
       $string,
-      &$matches,
+      inout $matches,
     );
     if ($result !== 1) {
       return null;
@@ -96,9 +96,8 @@ class AutoLinkExtension extends AutoLink {
     string $markdown,
     int $offset,
   ): (string, int) {
-    $matches = [];
     $rest = Str\slice($markdown, $offset);
-    \preg_match('/^[^[\]<> ]+/', $rest, &$matches);
+    $matches = Regex\first_match($rest, re"/^[^[\]<> ]+/");
     $match = $matches[0] ?? '';
     if ($match === '') {
       return tuple('', $offset);

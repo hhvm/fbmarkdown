@@ -10,15 +10,11 @@
 
 namespace Facebook\Markdown\UnparsedBlocks;
 
-use namespace HH\Lib\Str;
+use namespace HH\Lib\{Regex, Str};
 use type Facebook\Markdown\Blocks\Heading as ASTHeading;
 use namespace Facebook\Markdown\Inlines;
 
 class ATXHeading extends LeafBlock implements BlockProducer {
-  const vec<string> PATTERNS = vec[
-    '/^ {0,3}(?<level>#{1,6})([ \t](?<title>.*))?[ \t]+#+[ \t]*$/',
-    '/^ {0,3}(?<level>#{1,6})([ \t](?<title>.*))?$/',
-  ];
 
   public function __construct(private int $level, private string $heading) {
   }
@@ -27,23 +23,27 @@ class ATXHeading extends LeafBlock implements BlockProducer {
     Context $_context,
     Lines $lines,
   ): ?(Block, Lines) {
+    $patterns = vec[
+      re"/^ {0,3}(?<level>#{1,6})([ \\t](?<title>.*))?[ \\t]+#+[ \\t]*$/",
+      re"/^ {0,3}(?<level>#{1,6})([ \\t](?<title>.*))?$/",
+    ];
+
     list($first, $rest) = $lines->getFirstLineAndRest();
 
-    $matches = [];
-    $title = null;
-    foreach (self::PATTERNS as $pattern) {
-      $result = \preg_match($pattern, $first, &$matches);
-      if ($result === 1) {
+    $title = $level = null;
+    foreach ($patterns as $pattern) {
+      $matches = Regex\first_match($first, $pattern);
+      if ($matches is nonnull) {
         $title = $matches['title'] ?? '';
+        $level = Str\length($matches['level']);
         break;
       }
     }
 
-    if ($title === null) {
+    if ($title is null || $level is null) {
       return null;
     }
 
-    $level = Str\length($matches['level']);
     return tuple(new self($level, Str\trim($title)), $rest);
   }
 

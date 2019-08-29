@@ -12,7 +12,7 @@ namespace Facebook\Markdown\UnparsedBlocks;
 
 use type Facebook\Markdown\Blocks\ListItem as ASTNode;
 use namespace Facebook\Markdown\Inlines;
-use namespace HH\Lib\{C, Str, Vec};
+use namespace HH\Lib\{C, Regex, Str, Vec};
 
 class ListItem extends ContainerBlock<Block> implements BlockProducer {
   const string MAX_INDENT_CONTEXT = 'list item max indent';
@@ -64,14 +64,11 @@ class ListItem extends ContainerBlock<Block> implements BlockProducer {
       $max_indent,
       $column,
     );
-    $matches = [];
-    if (
-      \preg_match(
-        '/^(?<marker>[-+*]|(?<digits>[0-9]{1,9})[.)])/',
-        $line,
-        &$matches,
-      ) !== 1
-    ) {
+    $matches = Regex\first_match(
+      $line,
+      re"/^(?<marker>[-+*]|(?<digits>[0-9]{1,9})[.)])/",
+    );
+    if ($matches is null) {
       return null;
     }
 
