@@ -105,7 +105,6 @@ class BlockQuote extends ContainerBlock<Block> implements BlockProducer {
       );
       $col = $col + $n;
 
-      $offset = null;
       if (Str\starts_with($line, '> ')) {
         $line = Str\slice($line, 2);
         $col += 2;

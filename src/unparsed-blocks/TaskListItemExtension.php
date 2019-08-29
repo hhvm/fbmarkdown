@@ -46,7 +46,7 @@ class TaskListItemExtension extends ListItem {
         $contents,
       );
     }
-    list($first, $rest) = $contents->getFirstLineAndRest();
+    list($first, $_rest) = $contents->getFirstLineAndRest();
     $first = Str\trim_left($first);
     if (Str\starts_with($first, '[ ] ')) {
       $contents = $contents->withoutFirstNBytes(4);

@@ -81,7 +81,6 @@ class Emphasis extends Inline {
     if (!self::isStartOfRun($context, $markdown, $offset)) {
       return null;
     }
-    $first = $markdown[$offset];
 
     // This is tricky as until we find the closing marker, we don't know if
     // `***` means:

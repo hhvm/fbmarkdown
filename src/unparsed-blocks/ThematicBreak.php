@@ -18,8 +18,6 @@ class ThematicBreak extends LeafBlock implements BlockProducer {
 
   <<__Memoize>>
   private static function getPattern(): string {
-    $pattern = '/^ {0,3}';
-
     return vec['-', '_', '*']
       |> Vec\map($$, $c ==> \preg_quote($c, '/'))
       |> Vec\map($$, $c ==> '('.$c."[ \\t]*){3,}")
