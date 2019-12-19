@@ -30,7 +30,8 @@ class ATXHeading extends LeafBlock implements BlockProducer {
 
     list($first, $rest) = $lines->getFirstLineAndRest();
 
-    $title = $level = null;
+    $title = null;
+    $level = null;
     foreach ($patterns as $pattern) {
       $matches = Regex\first_match($first, $pattern);
       if ($matches is nonnull) {
