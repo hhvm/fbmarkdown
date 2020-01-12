@@ -21,7 +21,7 @@ final class SpecTest extends TestCase {
   // Sanity check - make sure it matches the last one in the spec
   const int EXAMPLE_COUNT = 649;
 
-  public function getSpecExamples(): array<(string, string, string, ?string)> {
+  public function getSpecExamples(): varray<(string, string, string, ?string)> {
     $text = \file_get_contents(__DIR__.'/../third-party/spec.txt');
     $raw_examples = vec[];
     $offset = 0;
