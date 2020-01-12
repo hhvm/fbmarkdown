@@ -45,7 +45,7 @@ final class SpecTest extends TestCase {
       $offset = $end + Str\length(self::EXAMPLE_END);
     }
 
-    $examples = [];
+    $examples = varray[];
 
     foreach ($raw_examples as list($example, $extension)) {
       $parts = Str\split($example, "\n.\n");

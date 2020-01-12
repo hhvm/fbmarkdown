@@ -53,7 +53,7 @@ class RawHTML extends Inline {
 
     $slice = Str\slice($string, $offset);
 
-    $matches = [];
+    $matches = darray[];
     if (
       \preg_match_with_matches(
         '/^('.self::OPEN_TAG.'|'.self::CLOSING_TAG.'|'.self::DECLARATION.')/i',
