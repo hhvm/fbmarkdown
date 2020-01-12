@@ -9,4 +9,3 @@ enable_experimental_tc_features=shape_field_check,sealed_classes
 disable_primitive_refinement=true
 disallow_stringish_magic=true
 user_attributes=
-disallow_array_literal = true
