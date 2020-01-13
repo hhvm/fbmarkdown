@@ -314,7 +314,7 @@ class MarkdownRenderer extends Renderer<string> {
       return \mb_encode_numericentity(
         $node->getContent(),
         // start, end, offset, mask
-        [0, 0xffff, 0, 0xffff],
+        varray[0, 0xffff, 0, 0xffff],
         'UTF-8',
       );
     }

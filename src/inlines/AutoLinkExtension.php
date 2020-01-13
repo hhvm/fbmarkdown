@@ -43,7 +43,7 @@ class AutoLinkExtension extends AutoLink {
 
     $string = Str\slice($markdown, $offset);
 
-    $matches = [];
+    $matches = darray[];
     $result = \preg_match_with_matches(
       '/^(?<prefix>'.self::PREFIX.')(?<domain>'.self::DOMAIN.')/i',
       $string,
