@@ -15,8 +15,8 @@ use function Facebook\FBExpect\expect;
 
 final class EdgeCaseTest extends TestCase {
   public function getManualExamples(
-  ): varray<(string, string)> {
-    return varray[
+  ): vec<(string, string)> {
+    return vec[
       tuple("- foo\n\n", "<ul>\n<li>foo</li>\n</ul>\n"),
       tuple("- foo\n\n\n", "<ul>\n<li>foo</li>\n</ul>\n"),
       tuple(
