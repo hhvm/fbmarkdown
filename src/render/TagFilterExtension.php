@@ -10,7 +10,7 @@
 
 namespace Facebook\Markdown;
 
-use namespace HH\Lib\Str;
+use namespace HH\Lib\{Str, Keyset};
 
 class TagFilterExtension extends RenderFilter {
   <<__Override>>
@@ -22,6 +22,10 @@ class TagFilterExtension extends RenderFilter {
       return vec[$this->filterInlineHTML($node)];
     }
     return vec[$node];
+  }
+
+  public function addToTagBlacklist(keyset<string> $toAdd): void {
+    $this->blacklist = Keyset\union($this->blacklist, $toAdd);
   }
 
   protected function filterHTMLBlock(
@@ -36,7 +40,7 @@ class TagFilterExtension extends RenderFilter {
     return new Inlines\RawHTML($this->filterHTML($inline->getContent()));
   }
 
-  const keyset<string> DENYLIST = keyset[
+  private keyset<string> DENYLIST = keyset[
     '<title',
     '<textarea',
     '<style',
@@ -49,12 +53,7 @@ class TagFilterExtension extends RenderFilter {
   ];
 
   protected function filterHTML(string $code): string {
-<<<<<<< HEAD
-    foreach (static::DENYLIST as $tag) {
-=======
-
-    foreach (static::BLACKLIST as $tag) {
->>>>>>> ba9a3b0... try 1
+    foreach ($this->DENYLIST as $tag) {
       $offset = 0;
       while (true) {
         $offset = Str\search_ci($code, $tag, $offset);

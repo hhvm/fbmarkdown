@@ -14,7 +14,7 @@ use type Facebook\HackTest\DataProvider;
 use function Facebook\FBExpect\expect;
 use namespace HH\Lib\{Str};
 
-final class NoFollowUgcTest extends TestCase {
+final class NoFollowUgcAndImageTest extends TestCase {
     protected function assertXSSExampleMatches(
         string $name,
         string $in,
@@ -26,8 +26,9 @@ final class NoFollowUgcTest extends TestCase {
             ->enableTrustedInput_UNSAFE()
             ->disableExtensions();
         $render_ctx = (new RenderContext())
-            ->disableExtensions()
-            ->addNoFollowUGCAllLinks();
+            ->addNoFollowUGCAllLinks()
+            ->enableImageFiltering();
+
         if ($extension !== null) {
             $parser_ctx->enableNamedExtension($extension);
             $render_ctx->enableNamedExtension($extension);
@@ -52,7 +53,7 @@ final class NoFollowUgcTest extends TestCase {
         );
     }
 
-    <<DataProvider('getNoFollowUgcExamples')>>
+    <<DataProvider('getNoFollowUgcAndImageExamples')>>
     public function testXSSExample(string $in, string $expected_html): void {
         $this->assertXSSExampleMatches(
             'unnamed',
@@ -62,7 +63,7 @@ final class NoFollowUgcTest extends TestCase {
         );
     }
 
-    public function getNoFollowUgcExamples(): vec<(string, string)> {
+    public function getNoFollowUgcAndImageExamples(): vec<(string, string)> {
         return vec[
             // LINKS
             tuple(
@@ -82,6 +83,12 @@ https://www.facebook.com
 
 [foo]",
                 "<p><a href=\"https://www.facebook.com\" rel=\"nofollow ugc\">foo</a></p>\n",
+            ),
+            // IMAGES
+            tuple(
+                '<img src="img_girl.jpg" alt="Girl in a jacket" width="500" height="600">',
+                '&lt;img src="img_girl.jpg" alt="Girl in a jacket" width="500" height="600">'.
+                "\n",
             ),
         ];
     }
