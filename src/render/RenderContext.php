@@ -18,6 +18,7 @@ class RenderContext {
   private vec<RenderFilter> $extensions;
   private vec<RenderFilter> $enabledExtensions;
   private vec<RenderFilter> $filters = vec[];
+  private bool $areLinksNoFollowUGC = false;
   private ?Document $document;
 
   public function __construct() {
@@ -30,6 +31,15 @@ class RenderContext {
   public function disableExtensions(): this {
     $this->enabledExtensions = vec[];
     return $this;
+  }
+
+  public function addNoFollowUGCAllLinks(): this {
+    $this->areLinksNoFollowUGC = true;
+    return $this;
+  }
+
+  public function areLinksNoFollowUGC(): bool {
+    return $this->areLinksNoFollowUGC;
   }
 
   public function disableNamedExtension(string $extension): this {
