@@ -66,10 +66,7 @@ class Context {
   public function enableNamedExtension(string $name): this {
     $this->disabledBlockTypes = Keyset\filter(
       $this->disabledBlockTypes,
-      $class ==> !Str\ends_with(
-        Str\lowercase($class),
-        "\\".$name.'extension',
-      ),
+      $class ==> !Str\ends_with(Str\lowercase($class), "\\".$name.'extension'),
     );
     return $this;
   }
@@ -79,8 +76,8 @@ class Context {
     return $this;
   }
 
-  private dict<string, LinkReferenceDefinition> $linkReferenceDefinitions
-    = dict[];
+  private dict<string, LinkReferenceDefinition> $linkReferenceDefinitions =
+    dict[];
 
   public function getLinkReferenceDefinition(
     string $key,
@@ -110,6 +107,18 @@ class Context {
   }
 
   private bool $isHtmlEnabled = false;
+  protected bool $isAllURIEnabled = false;
+  private keyset<string> $allowedURIs = keyset[];
+
+  public function enableAllURISchemes_UNSAFE(): this {
+    $this->isAllURIEnabled = true;
+    return $this;
+  }
+
+  public function enableURISchemeAllowlist(keyset<string> $allowlist): this {
+    $this->allowedURIs = $allowlist;
+    return $this;
+  }
 
   public function enableHTML_UNSAFE(): this {
     $this->isHtmlEnabled = true;
@@ -118,6 +127,14 @@ class Context {
 
   public function isHTMLEnabled(): bool {
     return $this->isHtmlEnabled;
+  }
+
+  public function isAllURIEnabled(): bool {
+    return $this->isAllURIEnabled;
+  }
+
+  public function getAllowedURIs(): keyset<string> {
+    return $this->allowedURIs;
   }
 
   public function getBlockTypes(): keyset<classname<BlockProducer>> {
@@ -145,7 +162,7 @@ class Context {
     return $this;
   }
 
-  public function getContext(string $context): mixed{
+  public function getContext(string $context): mixed {
     $stack = $this->stacks[$context] ?? vec[];
     return C\last($stack);
   }
@@ -153,7 +170,7 @@ class Context {
   const string PARAGRAPH_CONTINUATION_FLAG = 'paragraph continuation';
 
   public function isInParagraphContinuation(): bool {
-    return (bool) $this->getContext(self::PARAGRAPH_CONTINUATION_FLAG);
+    return (bool)$this->getContext(self::PARAGRAPH_CONTINUATION_FLAG);
   }
 
   public function pushParagraphContinuation(bool $value): this {

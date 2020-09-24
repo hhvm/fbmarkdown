@@ -22,9 +22,27 @@ final class ParserContext {
     $this->inlineContext = new InlineContext();
   }
 
+  public function enableTrustedInput_UNSAFE(): this {
+    $this->enableHTML_UNSAFE();
+    $this->enableAllURISchemes_UNSAFE();
+    return $this;
+  }
+
   public function enableHTML_UNSAFE(): this {
     $this->blockContext->enableHTML_UNSAFE();
     $this->inlineContext->enableHTML_UNSAFE();
+    return $this;
+  }
+
+  public function enableURISchemeAllowlist(keyset<string> $allowlist): this {
+    $this->blockContext->enableURISchemeAllowlist($allowlist);
+    $this->inlineContext->enableURISchemeAllowlist($allowlist);
+    return $this;
+  }
+
+  public function enableAllURISchemes_UNSAFE(): this {
+    $this->blockContext->enableAllURISchemes_UNSAFE();
+    $this->inlineContext->enableAllURISchemes_UNSAFE();
     return $this;
   }
 
@@ -61,7 +79,7 @@ final class ParserContext {
     return $this->blockContext;
   }
 
-  public function getInlineContext(): InlineContext{
+  public function getInlineContext(): InlineContext {
     return $this->inlineContext;
   }
 

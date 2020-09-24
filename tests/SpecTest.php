@@ -93,7 +93,7 @@ final class SpecTest extends TestCase {
     ?string $extension,
   ): void {
     $parser_ctx = (new ParserContext())
-      ->enableHTML_UNSAFE()
+      ->enableTrustedInput_UNSAFE()
       ->disableExtensions();
     $render_ctx = (new RenderContext())
       ->disableExtensions();

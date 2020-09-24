@@ -14,8 +14,7 @@ use type Facebook\HackTest\DataProvider;
 use function Facebook\FBExpect\expect;
 
 final class EdgeCaseTest extends TestCase {
-  public function getManualExamples(
-  ): vec<(string, string)> {
+  public function getManualExamples(): vec<(string, string)> {
     return vec[
       tuple("- foo\n\n", "<ul>\n<li>foo</li>\n</ul>\n"),
       tuple("- foo\n\n\n", "<ul>\n<li>foo</li>\n</ul>\n"),
@@ -25,7 +24,7 @@ final class EdgeCaseTest extends TestCase {
         "<tr>\n<th>foo</th>\n<th>bar</th>\n</tr>\n".
         "</thead>\n<tbody>\n".
         "<tr>\n<td><code>||</code></td>\n<td>herp</td>\n</tr>".
-        "</tbody></table>\n"
+        "</tbody></table>\n",
       ),
       // Already covered in the spec, but emphasizing here as they
       // illustrate correct binding for the next problme
@@ -59,10 +58,7 @@ final class EdgeCaseTest extends TestCase {
   }
 
   <<DataProvider('getManualExamples')>>
-  public function testManualExample(
-    string $in,
-    string $expected_html,
-  ): void {
+  public function testManualExample(string $in, string $expected_html): void {
     $this->assertExampleMatches(
       'unnamed',
       $in,
