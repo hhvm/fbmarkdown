@@ -34,7 +34,9 @@ final class ParserContext {
     return $this;
   }
 
-  public function enableURISchemeAllowlist(keyset<string> $allowlist): this {
+  public function enableURISchemeAllowlist(
+    keyset<string> $allowlist = keyset["http:", "https:", "irc:", "mailto:"],
+  ): this {
     $this->blockContext->enableURISchemeAllowlist($allowlist);
     $this->inlineContext->enableURISchemeAllowlist($allowlist);
     return $this;

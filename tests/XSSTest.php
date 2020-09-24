@@ -23,6 +23,7 @@ final class XSSTest extends TestCase {
     ): void {
         $parser_ctx = (new ParserContext())
             ->enableHTML_UNSAFE()
+            //->enableURISchemeAllowlist(keyset["http"])
             ->disableExtensions();
         $render_ctx = (new RenderContext())
             ->disableExtensions();
@@ -61,9 +62,93 @@ final class XSSTest extends TestCase {
     }
 
     public function getXSSExamples(): vec<(string, string)> {
-        return vec[tuple(
-            "[a](javascript:prompt(document.cookie))",
-            "<p>javascript:prompt(document.cookie)</p>",
-        )];
+        return vec[
+            // LINKS
+            tuple(
+                "[a](javascript:prompt(document.cookie))",
+                "<p>[a](javascript:prompt(document.cookie))</p>\n",
+            ),
+            tuple(
+                "[notmalicious](javascript:window.onerror=alert;throw%20document.cookie)",
+                "<p>[notmalicious](javascript:window.onerror=alert;throw%20document.cookie)</p>\n",
+            ),
+            tuple(
+                "[a](j    a   v   a   s   c   r   i   p   t:prompt(document.cookie))",
+                "<p>[a](j    a   v   a   s   c   r   i   p   t:prompt(document.cookie))</p>\n",
+            ),
+            tuple(
+                "[test](javascript://%0d%0aprompt(1))",
+                "<p>[test](javascript://%0d%0aprompt(1))</p>\n",
+            ),
+            tuple(
+                "[test](javascript://%0d%0aprompt(1);com)",
+                "<p>[test](javascript://%0d%0aprompt(1);com)</p>\n",
+            ),
+            tuple(
+                "[notmalicious](javascript:window.onerror=alert;throw%20document.cookie)",
+                "<p>[notmalicious](javascript:window.onerror=alert;throw%20document.cookie)</p>\n",
+            ),
+            tuple(
+                "[notmalicious](javascript://%0d%0awindow.onerror=alert;throw%20document.cookie)",
+                "<p>[notmalicious](javascript://%0d%0awindow.onerror=alert;throw%20document.cookie)</p>\n",
+            ),
+            tuple(
+                "[a](data:text/html;base64,PHNjcmlwdD5hbGVydCgnWFNTJyk8L3NjcmlwdD4K)",
+                "<p>[a](data:text/html;base64,PHNjcmlwdD5hbGVydCgnWFNTJyk8L3NjcmlwdD4K)</p>\n",
+            ),
+            tuple(
+                "[clickme](vbscript:alert(document.domain))",
+                "<p>[clickme](vbscript:alert(document.domain))</p>\n",
+            ),
+            tuple(
+                "[a](javascript:this;alert(1))",
+                "<p>[a](javascript:this;alert(1))</p>\n",
+            ),
+            tuple(
+                "[a](javascript://www.google.com%0Aprompt(1))",
+                "<p>[a](javascript://www.google.com%0Aprompt(1))</p>\n",
+            ),
+            tuple(
+                "[a](javascript://%0d%0aconfirm(1);com)",
+                "<p>[a](javascript://%0d%0aconfirm(1);com)</p>\n",
+            ),
+            tuple(
+                "[a](javascript:window.onerror=confirm;throw%201)",
+                "<p>[a](javascript:window.onerror=confirm;throw%201)</p>\n",
+            ),
+            tuple(
+                "[a](javascript://www.google.com%0Aalert(1))",
+                "<p>[a](javascript://www.google.com%0Aalert(1))</p>\n",
+            ),
+            tuple(
+                "[a]('javascript:alert(\"1\")')",
+                "<p>[a]('javascript:alert(&quot;1&quot;)')</p>\n",
+            ),
+            tuple(
+                "[a](JaVaScRiPt:alert(1))",
+                "<p>[a](JaVaScRiPt:alert(1))</p>\n",
+            ),
+            // AUTOLINKS
+            tuple(
+                "</http://<?php\><\h1\><script:script>confirm(2)",
+                "<p>&lt;/http://&lt;?php&gt;&lt;\h1&gt;&lt;script:script&gt;confirm(2)</p>\n",
+            ),
+            tuple(
+                "<javascript:prompt(document.cookie)>",
+                "<p>&lt;javascript:prompt(document.cookie)&gt;</p>\n",
+            ),
+            tuple(
+                "<atielking@slack-corp.com>",
+                "<p>&lt;atielking@slack-corp.com&gt;</p>\n",
+            ),
+            // LINK REFERENCE DEFINITIONS
+            tuple(
+                "[foo]:
+javascript:prompt(document.cookie)
+
+[foo]",
+                "<p>[foo]:\njavascript:prompt(document.cookie)</p>\n<p>[foo]</p>\n",
+            ),
+        ];
     }
 }

@@ -16,7 +16,7 @@ use function Facebook\Markdown\_Private\{
   consume_link_title,
 };
 use namespace Facebook\Markdown\Inlines;
-use namespace HH\Lib\Str;
+use namespace HH\Lib\{C, Str};
 
 class LinkReferenceDefinition extends LeafBlock implements BlockProducer {
   public function __construct(
@@ -76,7 +76,14 @@ class LinkReferenceDefinition extends LeafBlock implements BlockProducer {
     }
 
     list($destination, $lines) = $result;
-    // TODO: check URI!
+    if (!$context->isAllURIEnabled()) {
+      $allowedURIs = $context->getAllowedURIs();
+      if (
+        !C\any($allowedURIs, $elem ==> Str\starts_with_ci($destination, $elem))
+      ) {
+        return null;
+      }
+    }
     $title = self::consumeWhitespaceAndTitle($lines);
     if ($title !== null) {
       list($title, $rest) = $title;

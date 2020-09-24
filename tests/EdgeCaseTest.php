@@ -68,7 +68,10 @@ final class EdgeCaseTest extends TestCase {
   }
 
   public function testTagFilter(): void {
-    $ast = parse((new ParserContext())->enableHTML_UNSAFE(), '<iframe />');
+    $ast = parse(
+      (new ParserContext())->enableTrustedInput_UNSAFE(),
+      '<iframe />',
+    );
     $html = (new HTMLRenderer(new RenderContext()))->render($ast);
     expect($html)->toBeSame("&lt;iframe />\n");
     $html = (
