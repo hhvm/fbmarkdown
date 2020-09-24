@@ -70,6 +70,7 @@ class Link extends Inline {
     int $offset,
     keyset<classname<Inline>> $inners,
   ): ?(Link, int) {
+    echo "HI";
     if ($string[$offset] !== '[') {
       return null;
     }
@@ -94,9 +95,9 @@ class Link extends Inline {
       }
       if ($chr === '[') {
         if (
-          $string[$offset - 1] !== '!'
-          && !C\contains_key($inners, Link::class)
-          && self::consume($ctx, $string, $offset) !== null
+          $string[$offset - 1] !== '!' &&
+          !C\contains_key($inners, Link::class) &&
+          self::consume($ctx, $string, $offset) !== null
         ) {
           return null;
         }
@@ -133,6 +134,7 @@ class Link extends Inline {
     }
 
     $key = Str\slice($string, $start, $offset - $start);
+    echo $key;
     $offset++;
     $text = parse($ctx, $key);
 
@@ -142,7 +144,7 @@ class Link extends Inline {
       if ($def === null) {
         return null;
       }
-
+      echo $def->getDestination();
       return tuple(
         new self($text, $def->getDestination(), $def->getTitle()),
         $offset + 2,
@@ -173,7 +175,7 @@ class Link extends Inline {
           if ($offset + 1 >= $len) {
             return null;
           }
-          $matched .= $char.$string[$offset+1];
+          $matched .= $char.$string[$offset + 1];
           ++$offset;
           continue;
         }
@@ -189,6 +191,7 @@ class Link extends Inline {
       if ($def === null) {
         return null;
       }
+      echo $def->getDestination();
 
       return tuple(
         new self($text, $def->getDestination(), $def->getTitle()),
@@ -199,6 +202,7 @@ class Link extends Inline {
     $result = self::consumeDestinationAndTitle($string, $offset);
     if ($result !== null) {
       list($destination, $title, $offset) = $result;
+      echo $destination;
       return tuple(new self($text, $destination, $title), $offset);
     }
 
@@ -207,7 +211,7 @@ class Link extends Inline {
     if ($def === null) {
       return null;
     }
-
+    echo $def->getDestination();
     return tuple(
       new self($text, $def->getDestination(), $def->getTitle()),
       $offset,

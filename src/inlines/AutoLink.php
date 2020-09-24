@@ -10,7 +10,7 @@
 
 namespace Facebook\Markdown\Inlines;
 
-use namespace HH\Lib\Str;
+use namespace HH\Lib\{C, Str};
 
 class AutoLink extends Inline {
   public function __construct(
@@ -41,7 +41,7 @@ class AutoLink extends Inline {
 
   <<__Override>>
   public static function consume(
-    Context $_,
+    Context $context,
     string $string,
     int $offset,
   ): ?(Inline, int) {
@@ -58,17 +58,17 @@ class AutoLink extends Inline {
 
     $uri = Str\slice($string, $start, $end - $start);
     if (\preg_match(self::ABSOLUTE_URI_PATTERN, $uri) === 1) {
-      return tuple(
-        new self($uri, $uri),
-        $offset,
-      );
+      if (!$context->isAllURIEnabled()) {
+        $allowedURIs = $context->getAllowedURIs();
+        if (!C\contains_key($allowedURIs, $uri)) {
+          return null;
+        }
+      }
+      return tuple(new self($uri, $uri), $offset);
     }
 
     if (\preg_match(self::EMAIL_ADDRESS_PATTERN, $uri) === 1) {
-      return tuple(
-        new self($uri, 'mailto:'.$uri),
-        $offset,
-      );
+      return tuple(new self($uri, 'mailto:'.$uri), $offset);
     }
 
     return null;

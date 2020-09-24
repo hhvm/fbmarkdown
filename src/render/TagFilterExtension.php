@@ -14,10 +14,7 @@ use namespace HH\Lib\Str;
 
 class TagFilterExtension extends RenderFilter {
   <<__Override>>
-  public function filter(
-    RenderContext $_context,
-    ASTNode $node,
-  ): vec<ASTNode> {
+  public function filter(RenderContext $_context, ASTNode $node): vec<ASTNode> {
     if ($node is Blocks\HTMLBlock) {
       return vec[$this->filterHTMLBlock($node)];
     }
@@ -52,7 +49,12 @@ class TagFilterExtension extends RenderFilter {
   ];
 
   protected function filterHTML(string $code): string {
+<<<<<<< HEAD
     foreach (static::DENYLIST as $tag) {
+=======
+
+    foreach (static::BLACKLIST as $tag) {
+>>>>>>> ba9a3b0... try 1
       $offset = 0;
       while (true) {
         $offset = Str\search_ci($code, $tag, $offset);
@@ -60,8 +62,7 @@ class TagFilterExtension extends RenderFilter {
           break;
         }
 
-        $code =
-          Str\slice($code, 0, $offset).
+        $code = Str\slice($code, 0, $offset).
           '&lt;'.
           Str\slice($code, $offset + 1);
         $offset += 3; // len('&lt;') - len('<')
