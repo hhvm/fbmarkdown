@@ -70,7 +70,6 @@ class Link extends Inline {
     int $offset,
     keyset<classname<Inline>> $inners,
   ): ?(Link, int) {
-    echo "HI";
     if ($string[$offset] !== '[') {
       return null;
     }
@@ -134,7 +133,6 @@ class Link extends Inline {
     }
 
     $key = Str\slice($string, $start, $offset - $start);
-    echo $key;
     $offset++;
     $text = parse($ctx, $key);
 
@@ -144,7 +142,6 @@ class Link extends Inline {
       if ($def === null) {
         return null;
       }
-      echo $def->getDestination();
       return tuple(
         new self($text, $def->getDestination(), $def->getTitle()),
         $offset + 2,
@@ -191,7 +188,6 @@ class Link extends Inline {
       if ($def === null) {
         return null;
       }
-      echo $def->getDestination();
 
       return tuple(
         new self($text, $def->getDestination(), $def->getTitle()),
@@ -202,7 +198,17 @@ class Link extends Inline {
     $result = self::consumeDestinationAndTitle($string, $offset);
     if ($result !== null) {
       list($destination, $title, $offset) = $result;
-      echo $destination;
+      if (!$ctx->isAllURIEnabled()) {
+        $allowedURIs = $ctx->getAllowedURIs();
+        if (
+          !C\any(
+            $allowedURIs,
+            $elem ==> Str\starts_with_ci($destination, $elem),
+          )
+        ) {
+          return null;
+        }
+      }
       return tuple(new self($text, $destination, $title), $offset);
     }
 
@@ -211,7 +217,6 @@ class Link extends Inline {
     if ($def === null) {
       return null;
     }
-    echo $def->getDestination();
     return tuple(
       new self($text, $def->getDestination(), $def->getTitle()),
       $offset,
