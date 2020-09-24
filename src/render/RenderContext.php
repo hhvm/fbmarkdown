@@ -50,6 +50,16 @@ class RenderContext {
     return $this;
   }
 
+  public function enableImageFiltering(): this {
+    foreach ($this->extensions as $extension) {
+      if (\get_class($extension) === "Facebook\Markdown\TagFilterExtension") {
+        $extension = $extension as TagFilterExtension;
+        $extension->addToTagBlacklist(keyset["<img"]);
+      }
+    }
+    return $this;
+  }
+
   public function enableNamedExtension(string $extension): this {
     $this->enabledExtensions = $this->extensions
       |> Vec\filter(
