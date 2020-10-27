@@ -31,15 +31,15 @@ class Context {
   ];
 
   protected bool $isHtmlEnabled = false;
-  protected bool $isAllURIEnabled = false;
+  protected bool $areAllURISchemesEnabled = false;
   private keyset<string> $allowedURIs = keyset[];
 
   public function enableAllURISchemes_UNSAFE(): this {
-    $this->isAllURIEnabled = true;
+    $this->areAllURISchemesEnabled = true;
     return $this;
   }
 
-  public function enableURISchemeAllowlist(keyset<string> $allowlist): this {
+  public function setURISchemeAllowList(keyset<string> $allowlist): this {
     $this->allowedURIs = $allowlist;
     return $this;
   }
@@ -53,8 +53,8 @@ class Context {
     return $this->isHtmlEnabled;
   }
 
-  public function isAllURIEnabled(): bool {
-    return $this->isAllURIEnabled;
+  public function areAllURISchemesEnabled(): bool {
+    return $this->areAllURISchemesEnabled;
   }
 
   public function getAllowedURIs(): keyset<string> {

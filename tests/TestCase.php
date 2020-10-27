@@ -23,7 +23,7 @@ abstract class TestCase extends \Facebook\HackTest\HackTest {
     ?string $extension,
   ): void {
     $parser_ctx = (new ParserContext())
-      ->enableTrustedInput_UNSAFE()
+      ->setSourceType(SourceType::TRUSTED)
       ->disableExtensions();
     $render_ctx = (new RenderContext())
       ->disableExtensions();

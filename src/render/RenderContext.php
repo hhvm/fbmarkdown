@@ -28,6 +28,21 @@ class RenderContext {
     $this->enabledExtensions = $this->extensions;
   }
 
+  public function setSourceType(SourceType $type): this {
+    switch ($type) {
+      case SourceType::TRUSTED:
+        $this->disableImageFiltering();
+        break;
+      case SourceType::SPONSORED:
+        $this->addNoFollowUGCAllLinks();
+        break;
+      case SourceType::USER_GENERATED_CONTENT:
+        $this->addNoFollowUGCAllLinks();
+        break;
+    }
+    return $this;
+  }
+
   public function disableExtensions(): this {
     $this->enabledExtensions = vec[];
     return $this;
@@ -50,11 +65,10 @@ class RenderContext {
     return $this;
   }
 
-  public function enableImageFiltering(): this {
+  public function disableImageFiltering(): this {
     foreach ($this->extensions as $extension) {
-      if (\get_class($extension) === "Facebook\Markdown\TagFilterExtension") {
-        $extension = $extension as TagFilterExtension;
-        $extension->addToTagBlacklist(keyset["<img"]);
+      if ($extension is TagFilterExtension) {
+        $extension->removeFromTagBlacklist(keyset["<img"]);
       }
     }
     return $this;

@@ -136,10 +136,7 @@ final class XSSTest extends TestCase {
                 "<javascript:prompt(document.cookie)>",
                 "<p>&lt;javascript:prompt(document.cookie)&gt;</p>\n",
             ),
-            tuple(
-                "<atielking@slack-corp.com>",
-                "<p>&lt;atielking@slack-corp.com&gt;</p>\n",
-            ),
+            tuple("<me@example.com>", "<p>&lt;me@example.com&gt;</p>\n"),
             // LINK REFERENCE DEFINITIONS
             tuple(
                 "[foo]:

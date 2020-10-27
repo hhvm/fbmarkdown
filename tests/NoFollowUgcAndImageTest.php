@@ -22,12 +22,12 @@ final class NoFollowUgcAndImageTest extends TestCase {
         ?string $extension,
     ): void {
         $parser_ctx = (new ParserContext())
-            ->enableHTML_UNSAFE()
-            ->enableTrustedInput_UNSAFE()
+            ->setSourceType(SourceType::USER_GENERATED_CONTENT)
+            ->setURISchemeAllowList()
             ->disableExtensions();
         $render_ctx = (new RenderContext())
             ->addNoFollowUGCAllLinks()
-            ->enableImageFiltering();
+            ->setSourceType(SourceType::USER_GENERATED_CONTENT);
 
         if ($extension !== null) {
             $parser_ctx->enableNamedExtension($extension);
@@ -87,7 +87,7 @@ https://www.facebook.com
             // IMAGES
             tuple(
                 '<img src="img_girl.jpg" alt="Girl in a jacket" width="500" height="600">',
-                '&lt;img src="img_girl.jpg" alt="Girl in a jacket" width="500" height="600">'.
+                '<p>&lt;img src=&quot;img_girl.jpg&quot; alt=&quot;Girl in a jacket&quot; width=&quot;500&quot; height=&quot;600&quot;&gt;</p>'.
                 "\n",
             ),
         ];

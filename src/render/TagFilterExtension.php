@@ -10,7 +10,7 @@
 
 namespace Facebook\Markdown;
 
-use namespace HH\Lib\{Str, Keyset};
+use namespace HH\Lib\{Keyset, Str};
 
 class TagFilterExtension extends RenderFilter {
   <<__Override>>
@@ -24,8 +24,8 @@ class TagFilterExtension extends RenderFilter {
     return vec[$node];
   }
 
-  public function addToTagBlacklist(keyset<string> $toAdd): void {
-    $this->blacklist = Keyset\union($this->blacklist, $toAdd);
+  public function removeFromTagBlacklist(keyset<string> $toRemove): void {
+    $this->blacklist = Keyset\diff($this->blacklist, $toRemove);
   }
 
   protected function filterHTMLBlock(
@@ -50,6 +50,8 @@ class TagFilterExtension extends RenderFilter {
     '<noframes',
     '<script',
     '<plaintext',
+    '<img',
+    '<object',
   ];
 
   protected function filterHTML(string $code): string {

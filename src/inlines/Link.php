@@ -198,11 +198,11 @@ class Link extends Inline {
     $result = self::consumeDestinationAndTitle($string, $offset);
     if ($result !== null) {
       list($destination, $title, $offset) = $result;
-      if (!$ctx->isAllURIEnabled()) {
-        $allowedURIs = $ctx->getAllowedURIs();
+      if (!$ctx->areAllURISchemesEnabled()) {
+        $allowed_uris = $ctx->getAllowedURIs();
         if (
           !C\any(
-            $allowedURIs,
+            $allowed_uris,
             $elem ==> Str\starts_with_ci($destination, $elem),
           )
         ) {
