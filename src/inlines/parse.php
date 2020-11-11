@@ -16,7 +16,7 @@ function parse(
   Context $context,
   string $markdown,
 ): vec<Inline> {
-  list($parsed, $offset) = _Private\parse_with_blacklist(
+  list($parsed, $offset) = _Private\parse_with_denylist(
     $context,
     $markdown,
     0,

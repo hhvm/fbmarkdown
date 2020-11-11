@@ -13,14 +13,14 @@ namespace Facebook\Markdown\Inlines\_Private;
 use namespace Facebook\Markdown\Inlines;
 use namespace HH\Lib\{Str, Vec};
 
-function parse_with_blacklist (
+function parse_with_denylist (
   Inlines\Context $context,
   string $markdown,
   int $offset,
-  keyset<classname<Inlines\Inline>> $blacklist,
+  keyset<classname<Inlines\Inline>> $denylist,
 ): (vec<Inlines\Inline>, int) {
   $types = $context->getInlineTypes();
-  foreach ($blacklist as $type) {
+  foreach ($denylist as $type) {
     unset($types[$type]);
   }
 

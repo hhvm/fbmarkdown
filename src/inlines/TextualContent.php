@@ -23,11 +23,11 @@ class TextualContent extends InlineWithPlainTextContent {
     $len = Str\length($input);
 
     for ($i = $offset + 1; $i < $len; ++$i) {
-      list($inlines, $_) = _Private\parse_with_blacklist(
+      list($inlines, $_) = _Private\parse_with_denylist(
         $context,
         $input,
         $i,
-        /* blacklist = */ keyset[self::class],
+        /* denylist = */ keyset[self::class],
       );
       if (!C\is_empty($inlines)) {
         break;

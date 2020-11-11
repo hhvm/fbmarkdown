@@ -38,7 +38,7 @@ class HTMLBlock extends FencedBlock {
     '/^<\\?/' => '/\\?>/',
     '/^<![A-Z]/' => '/>/',
     '/^<!\\[CDATA\\[/' => '/\\]\\]>/',
-    // This very large whitelist is in the spec
+    // This very large allowlist is in the spec
     '/^<\\/?(address|article|aside|base|basefont|blockquote|body|caption|'.
       'center|col|colgroup|dd|details|dialog|dir|div|dl|dt|fieldset|'.
       'figcaption|figure|footer|form|frame|frameset|h[1-6]|head|header|hr|'.

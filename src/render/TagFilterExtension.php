@@ -39,7 +39,7 @@ class TagFilterExtension extends RenderFilter {
     return new Inlines\RawHTML($this->filterHTML($inline->getContent()));
   }
 
-  const keyset<string> BLACKLIST = keyset[
+  const keyset<string> DENYLIST = keyset[
     '<title',
     '<textarea',
     '<style',
@@ -52,7 +52,7 @@ class TagFilterExtension extends RenderFilter {
   ];
 
   protected function filterHTML(string $code): string {
-    foreach (static::BLACKLIST as $tag) {
+    foreach (static::DENYLIST as $tag) {
       $offset = 0;
       while (true) {
         $offset = Str\search_ci($code, $tag, $offset);
