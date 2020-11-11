@@ -77,9 +77,9 @@ class LinkReferenceDefinition extends LeafBlock implements BlockProducer {
 
     list($destination, $lines) = $result;
     if (!$context->areAllURISchemesEnabled()) {
-      $allowedURIs = $context->getAllowedURIs();
+      $allowed_uri_schemes = $context->getAllowedURISchemes();
       if (
-        !C\any($allowedURIs, $elem ==> Str\starts_with_ci($destination, $elem))
+        !C\any($allowed_uri_schemes, $elem ==> Str\starts_with_ci($destination, $elem.':'))
       ) {
         return null;
       }

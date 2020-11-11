@@ -23,6 +23,7 @@ final class XSSTest extends TestCase {
   ): void {
     $parser_ctx = (new ParserContext())
       ->enableHTML_UNSAFE()
+      ->setURISchemeAllowList(keyset["foo"])
       ->disableExtensions();
     $render_ctx = (new RenderContext())
       ->disableExtensions();
@@ -138,6 +139,15 @@ javascript:prompt(document.cookie)
 [foo]",
         "<p>[foo]:\njavascript:prompt(document.cookie)</p>\n<p>[foo]</p>\n",
       ),
+      // An accepted URI works, but a bad URI that's a longer version of the target URI shouldn't work
+      tuple(
+        "<foo:blah>",
+        "<p><a href=\"foo:blah\">foo:blah</a></p>\n",
+      ),
+      tuple(
+        "<foobar:blah>",
+        "<p>&lt;foobar:blah&gt;</p>\n",
+      )
     ];
   }
 }

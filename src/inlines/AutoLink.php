@@ -59,8 +59,8 @@ class AutoLink extends Inline {
     $uri = Str\slice($string, $start, $end - $start);
     if (\preg_match(self::ABSOLUTE_URI_PATTERN, $uri) === 1) {
       if (!$context->areAllURISchemesEnabled()) {
-        $allowedURIs = $context->getAllowedURIs();
-        if (!C\any($allowedURIs, $elem ==> Str\starts_with_ci($uri, $elem))) {
+        $allowed_uri_schemes = $context->getAllowedURISchemes();
+        if (!C\any($allowed_uri_schemes, $elem ==> Str\starts_with_ci($uri, $elem.':'))) {
           return null;
         }
       }
@@ -70,7 +70,7 @@ class AutoLink extends Inline {
     if (\preg_match(self::EMAIL_ADDRESS_PATTERN, $uri) === 1) {
       if (
         $context->areAllURISchemesEnabled() ||
-        C\contains_key($context->getAllowedURIs(), 'mailto')
+        C\contains_key($context->getAllowedURISchemes(), 'mailto')
       ) {
         return tuple(new self($uri, 'mailto:'.$uri), $offset);
       }

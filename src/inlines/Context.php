@@ -32,7 +32,7 @@ class Context {
 
   protected bool $isHtmlEnabled = false;
   protected bool $areAllURISchemesEnabled = false;
-  private keyset<string> $allowedURIs = keyset[];
+  private keyset<string> $allowedURISchemes = keyset[];
 
   public function enableAllURISchemes_UNSAFE(): this {
     $this->areAllURISchemesEnabled = true;
@@ -40,7 +40,7 @@ class Context {
   }
 
   public function setURISchemeAllowList(keyset<string> $allowlist): this {
-    $this->allowedURIs = $allowlist;
+    $this->allowedURISchemes = $allowlist;
     return $this;
   }
 
@@ -57,8 +57,8 @@ class Context {
     return $this->areAllURISchemesEnabled;
   }
 
-  public function getAllowedURIs(): keyset<string> {
-    return $this->allowedURIs;
+  public function getAllowedURISchemes(): keyset<string> {
+    return $this->allowedURISchemes;
   }
 
   public function getFilePath(): ?string {
