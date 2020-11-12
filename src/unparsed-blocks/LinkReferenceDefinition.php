@@ -16,7 +16,7 @@ use function Facebook\Markdown\_Private\{
   consume_link_title,
 };
 use namespace Facebook\Markdown\Inlines;
-use namespace HH\Lib\Str;
+use namespace HH\Lib\{C, Str};
 
 class LinkReferenceDefinition extends LeafBlock implements BlockProducer {
   public function __construct(
@@ -76,7 +76,14 @@ class LinkReferenceDefinition extends LeafBlock implements BlockProducer {
     }
 
     list($destination, $lines) = $result;
-
+    if (!$context->areAllURISchemesEnabled()) {
+      $allowed_uri_schemes = $context->getAllowedURISchemes();
+      if (
+        !C\any($allowed_uri_schemes, $elem ==> Str\starts_with_ci($destination, $elem.':'))
+      ) {
+        return null;
+      }
+    }
     $title = self::consumeWhitespaceAndTitle($lines);
     if ($title !== null) {
       list($title, $rest) = $title;
@@ -110,9 +117,7 @@ class LinkReferenceDefinition extends LeafBlock implements BlockProducer {
   }
 
   /** Consume whitespace, including at most one newline */
-  private static function consumeWhitespace(
-    Lines $lines,
-  ): ?Lines {
+  private static function consumeWhitespace(Lines $lines): ?Lines {
     if ($lines->isEmpty()) {
       return null;
     }
@@ -152,22 +157,20 @@ class LinkReferenceDefinition extends LeafBlock implements BlockProducer {
     return self::consumeTitle($lines);
   }
 
-  private static function consumeLabel(
-    Lines $lines,
-  ): ?(string, Lines) {
+  private static function consumeLabel(Lines $lines): ?(string, Lines) {
     list($column, $first_raw, $_) = $lines->getColumnFirstLineAndRest();
     list($_, $first, $_) = Lines::stripUpToNLeadingWhitespace(
       $first_raw,
       3,
       $column,
-  );
+    );
 
     if (!Str\starts_with($first, '[')) {
       return null;
     }
 
     $label = '';
-    $lines = $lines->withoutFirstNBytes((int) Str\search($first_raw, '[') + 1);
+    $lines = $lines->withoutFirstNBytes((int)Str\search($first_raw, '[') + 1);
 
     while (!$lines->isEmpty()) {
       list($line, $rest) = $lines->getFirstLineAndRest();
@@ -209,9 +212,7 @@ class LinkReferenceDefinition extends LeafBlock implements BlockProducer {
     return tuple($label, $lines);
   }
 
-  private static function consumeDestination(
-    Lines $lines,
-  ): ?(string, Lines) {
+  private static function consumeDestination(Lines $lines): ?(string, Lines) {
     if ($lines->isEmpty()) {
       return null;
     }
@@ -224,9 +225,7 @@ class LinkReferenceDefinition extends LeafBlock implements BlockProducer {
     return tuple($destination, $lines->withoutFirstNBytes($consumed_bytes));
   }
 
-  private static function consumeTitle(
-    Lines $lines,
-  ): ?(string, Lines) {
+  private static function consumeTitle(Lines $lines): ?(string, Lines) {
     if ($lines->isEmpty()) {
       return null;
     }

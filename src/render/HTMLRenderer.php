@@ -27,6 +27,7 @@ class HTMLRenderer extends Renderer<string> {
   }
 
   // This is the list from the reference implementation
+  //hackfmt-ignore
   const keyset<string> URI_SAFE = keyset[
     '-', '_', '.', '+', '!', '*', "'", '(', ')', ';', ':', '%', '#', '@', '?',
     '=', ';', ':', '/', ',', '+', '&', '$',
@@ -100,7 +101,7 @@ class HTMLRenderer extends Renderer<string> {
     if ($code !== '') {
       $code = self::escapeContent($code)."\n";
     }
-    return'<pre><code'.$extra.'>'.$code."</code></pre>\n";
+    return '<pre><code'.$extra.'>'.$code."</code></pre>\n";
   }
 
   <<__Override>>
@@ -134,24 +135,15 @@ class HTMLRenderer extends Renderer<string> {
     $first = C\first($children);
     if ($first is Blocks\Paragraph) {
       $children[0] = new Blocks\Paragraph(
-        Vec\concat(
-          vec[new Inlines\RawHTML($checkbox)],
-          $first->getContents(),
-        )
+        Vec\concat(vec[new Inlines\RawHTML($checkbox)], $first->getContents()),
       );
     } else {
-      $children = Vec\concat(
-        vec[new Blocks\HTMLBlock($checkbox)],
-        $children,
-      );
+      $children = Vec\concat(vec[new Blocks\HTMLBlock($checkbox)], $children);
     }
 
     return $this->renderListItem(
       $list,
-      new Blocks\ListItem(
-        $item->getNumber(),
-        $children,
-      ),
+      new Blocks\ListItem($item->getNumber(), $children),
     );
   }
 
@@ -206,7 +198,7 @@ class HTMLRenderer extends Renderer<string> {
       $start = '<ul>';
       $end = '</ul>';
     } else if ($start === 1) {
-      $start ='<ol>';
+      $start = '<ol>';
       $end = '</ol>';
     } else {
       $start = \sprintf('<ol start="%d">', $start);
@@ -252,10 +244,7 @@ class HTMLRenderer extends Renderer<string> {
       if ($alignment !== null) {
         $alignment = ' align="'.$alignment.'"';
       }
-      $html .=
-        '<th'.$alignment.'>'.
-        $this->renderNodes($cell).
-        "</th>\n";
+      $html .= '<th'.$alignment.'>'.$this->renderNodes($cell)."</th>\n";
     }
     $html .= "</tr>\n</thead>";
     return $html;
@@ -286,10 +275,7 @@ class HTMLRenderer extends Renderer<string> {
     if ($alignment !== null) {
       $alignment = ' align="'.$alignment.'"';
     }
-    return
-      "<td".$alignment.'>'.
-      $this->renderNodes($cell).
-      "</td>";
+    return "<td".$alignment.'>'.$this->renderNodes($cell)."</td>";
   }
 
   <<__Override>>
@@ -301,11 +287,16 @@ class HTMLRenderer extends Renderer<string> {
   protected function renderAutoLink(Inlines\AutoLink $node): string {
     $href = self::escapeURIAttribute($node->getDestination());
     $text = self::escapeContent($node->getText());
-    return '<a href="'.$href.'">'.$text.'</a>';
+    $noFollowUgcTag = $this->getContext()->areLinksNoFollowUGC()
+      ? ' rel="nofollow ugc"'
+      : '';
+    return '<a href="'.$href.'"'.$noFollowUgcTag.'>'.$text.'</a>';
   }
 
   <<__Override>>
-  protected function renderInlineWithPlainTextContent(Inlines\InlineWithPlainTextContent $node): string {
+  protected function renderInlineWithPlainTextContent(
+    Inlines\InlineWithPlainTextContent $node,
+  ): string {
     return self::escapeContent($node->getContent());
   }
 
@@ -353,7 +344,10 @@ class HTMLRenderer extends Renderer<string> {
     $text = $node->getText()
       |> Vec\map($$, $child ==> $this->render($child))
       |> Str\join($$, '');
-    return '<a href="'.$href.'"'.$title.'>'.$text.'</a>';
+    $noFollowUgcTag = $this->getContext()->areLinksNoFollowUGC()
+      ? ' rel="nofollow ugc"'
+      : '';
+    return '<a href="'.$href.'"'.$noFollowUgcTag."".$title.'>'.$text.'</a>';
   }
 
   <<__Override>>
@@ -367,7 +361,9 @@ class HTMLRenderer extends Renderer<string> {
   }
 
   <<__Override>>
-  protected function renderStrikethroughExtension(Inlines\StrikethroughExtension $node): string {
+  protected function renderStrikethroughExtension(
+    Inlines\StrikethroughExtension $node,
+  ): string {
     $children = $node->getChildren()
       |> Vec\map($$, $child ==> $this->render($child))
       |> Str\join($$, '');

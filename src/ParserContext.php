@@ -13,7 +13,15 @@ namespace Facebook\Markdown;
 use type Facebook\Markdown\UnparsedBlocks\Context as BlockContext;
 use type Facebook\Markdown\Inlines\Context as InlineContext;
 
+enum SourceType: int {
+  TRUSTED = 0;
+  SPONSORED = 1;
+  USER_GENERATED_CONTENT = 2;
+}
+
 final class ParserContext {
+
+  const keyset<string> DEFAULT_URI_SCHEME_ALLOW_LIST = keyset["http", "https", "irc", "mailto"];
   private BlockContext $blockContext;
   private InlineContext $inlineContext;
 
@@ -22,9 +30,43 @@ final class ParserContext {
     $this->inlineContext = new InlineContext();
   }
 
+  public function setSourceType(SourceType $type): this {
+    switch ($type) {
+      case SourceType::TRUSTED:
+        $this->enableAllFeaturesForTrustedInput_UNSAFE();
+        break;
+      case SourceType::SPONSORED:
+        $this->setAllowedURISchemes(self::DEFAULT_URI_SCHEME_ALLOW_LIST);
+        break;
+      case SourceType::USER_GENERATED_CONTENT:
+        break;
+    }
+    return $this;
+  }
+
+  public function enableAllFeaturesForTrustedInput_UNSAFE(): this {
+    $this->enableHTML_UNSAFE();
+    $this->enableAllURISchemes_UNSAFE();
+    return $this;
+  }
+
   public function enableHTML_UNSAFE(): this {
     $this->blockContext->enableHTML_UNSAFE();
     $this->inlineContext->enableHTML_UNSAFE();
+    return $this;
+  }
+
+  public function setAllowedURISchemes(
+    keyset<string> $allowlist
+  ): this {
+    $this->blockContext->setAllowedURISchemes($allowlist);
+    $this->inlineContext->setAllowedURISchemes($allowlist);
+    return $this;
+  }
+
+  public function enableAllURISchemes_UNSAFE(): this {
+    $this->blockContext->enableAllURISchemes_UNSAFE();
+    $this->inlineContext->enableAllURISchemes_UNSAFE();
     return $this;
   }
 
@@ -61,7 +103,7 @@ final class ParserContext {
     return $this->blockContext;
   }
 
-  public function getInlineContext(): InlineContext{
+  public function getInlineContext(): InlineContext {
     return $this->inlineContext;
   }
 

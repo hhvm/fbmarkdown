@@ -94,9 +94,9 @@ class Link extends Inline {
       }
       if ($chr === '[') {
         if (
-          $string[$offset - 1] !== '!'
-          && !C\contains_key($inners, Link::class)
-          && self::consume($ctx, $string, $offset) !== null
+          $string[$offset - 1] !== '!' &&
+          !C\contains_key($inners, Link::class) &&
+          self::consume($ctx, $string, $offset) !== null
         ) {
           return null;
         }
@@ -142,7 +142,6 @@ class Link extends Inline {
       if ($def === null) {
         return null;
       }
-
       return tuple(
         new self($text, $def->getDestination(), $def->getTitle()),
         $offset + 2,
@@ -173,7 +172,7 @@ class Link extends Inline {
           if ($offset + 1 >= $len) {
             return null;
           }
-          $matched .= $char.$string[$offset+1];
+          $matched .= $char.$string[$offset + 1];
           ++$offset;
           continue;
         }
@@ -199,6 +198,17 @@ class Link extends Inline {
     $result = self::consumeDestinationAndTitle($string, $offset);
     if ($result !== null) {
       list($destination, $title, $offset) = $result;
+      if (!$ctx->areAllURISchemesEnabled()) {
+        $allowed_uri_schemes = $ctx->getAllowedURISchemes();
+        if (
+          !C\any(
+            $allowed_uri_schemes,
+            $elem ==> Str\starts_with_ci($destination, $elem.':'),
+          )
+        ) {
+          return null;
+        }
+      }
       return tuple(new self($text, $destination, $title), $offset);
     }
 
@@ -207,7 +217,6 @@ class Link extends Inline {
     if ($def === null) {
       return null;
     }
-
     return tuple(
       new self($text, $def->getDestination(), $def->getTitle()),
       $offset,

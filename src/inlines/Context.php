@@ -31,6 +31,18 @@ class Context {
   ];
 
   protected bool $isHtmlEnabled = false;
+  protected bool $areAllURISchemesEnabled = false;
+  private keyset<string> $allowedURISchemes = keyset[];
+
+  public function enableAllURISchemes_UNSAFE(): this {
+    $this->areAllURISchemesEnabled = true;
+    return $this;
+  }
+
+  public function setAllowedURISchemes(keyset<string> $allowlist): this {
+    $this->allowedURISchemes = $allowlist;
+    return $this;
+  }
 
   public function enableHTML_UNSAFE(): this {
     $this->isHtmlEnabled = true;
@@ -39,6 +51,14 @@ class Context {
 
   public function isHTMLEnabled(): bool {
     return $this->isHtmlEnabled;
+  }
+
+  public function areAllURISchemesEnabled(): bool {
+    return $this->areAllURISchemesEnabled;
+  }
+
+  public function getAllowedURISchemes(): keyset<string> {
+    return $this->allowedURISchemes;
   }
 
   public function getFilePath(): ?string {
