@@ -23,7 +23,7 @@ final class XSSTest extends TestCase {
   ): void {
     $parser_ctx = (new ParserContext())
       ->enableHTML_UNSAFE()
-      ->setURISchemeAllowList(keyset["foo"])
+      ->setAllowedURISchemes(keyset["foo"])
       ->disableExtensions();
     $render_ctx = (new RenderContext())
       ->disableExtensions();

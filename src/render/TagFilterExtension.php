@@ -25,7 +25,7 @@ class TagFilterExtension extends RenderFilter {
   }
 
   public function removeFromTagBlacklist(keyset<string> $toRemove): void {
-    $this->blacklist = Keyset\diff($this->blacklist, $toRemove);
+    $this->DENYLIST = Keyset\diff($this->DENYLIST, $toRemove);
   }
 
   protected function filterHTMLBlock(
@@ -40,7 +40,7 @@ class TagFilterExtension extends RenderFilter {
     return new Inlines\RawHTML($this->filterHTML($inline->getContent()));
   }
 
-  private keyset<string> DENYLIST = keyset[
+  private keyset<string> $DENYLIST = keyset[
     '<title',
     '<textarea',
     '<style',

@@ -115,7 +115,7 @@ class Context {
     return $this;
   }
 
-  public function setURISchemeAllowList(keyset<string> $allowlist): this {
+  public function setAllowedURISchemes(keyset<string> $allowlist): this {
     $this->allowedURISchemes = $allowlist;
     return $this;
   }

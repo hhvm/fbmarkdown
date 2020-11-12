@@ -15,6 +15,8 @@ use function Facebook\FBExpect\expect;
 use namespace HH\Lib\{Str};
 
 final class NoFollowUgcAndImageTest extends TestCase {
+    const keyset<string> DEFAULT_URI_SCHEME_ALLOW_LIST = keyset["http", "https", "irc", "mailto"];
+
   protected function assertXSSExampleMatches(
     string $name,
     string $in,
@@ -23,7 +25,7 @@ final class NoFollowUgcAndImageTest extends TestCase {
   ): void {
     $parser_ctx = (new ParserContext())
       ->setSourceType(SourceType::USER_GENERATED_CONTENT)
-      ->setURISchemeAllowList()
+      ->setAllowedURISchemes(self::DEFAULT_URI_SCHEME_ALLOW_LIST)
       ->disableExtensions();
     $render_ctx = (new RenderContext())
       ->addNoFollowUGCAllLinks()
