@@ -47,7 +47,7 @@ function render(string $markdown): string {
 
 FBMarkdown currently supports three types of Markdown sources, with plans to expand: trusted, sponsored, and user-generated content.
 
-- __Trusted content mode__: For the parser, (a) embedded HTML is enabled, and (b) all URI schemes are enabled and will be parsed as links. For the renderer, filtering of `<img` tags is disabled.
+- __Trusted content mode__: For the parser, (a) embedded HTML is enabled, and (b) all URI schemes are enabled and will be parsed as links. For the renderer, `<img` tags are processed normally. In other modes, the `<img` tag is by default part of the HTML tags denylist, which we filter out. 
 
 - __Sponsored mode__: For the parser, a default set of URI schemes is enabled (`http`, `https`, `irc`, and `mailto`). For the renderer, `rel="nofollow ugc"` is added to all links.
 
