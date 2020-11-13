@@ -45,13 +45,19 @@ function render(string $markdown): string {
 }
 ```
 
-For complete compatibility with GitHub Flavored Markdown, support for embedded HTML must be enabled; it is disabled
-by default as a security precaution.
+FBMarkdown currently supports three types of Markdown sources, with plans to expand: trusted, sponsored, and user-generated content.
 
-```Hack
-$ctx = (new Markdown\ParserContext())->enableHTML_UNSAFE();
-$ast = Markdown\parse($ctx, $markdown);
-```
+- __Trusted content mode__: For the parser, (a) embedded HTML is enabled, and (b) all URI schemes are enabled and will be parsed as links. For the renderer, filtering of `<img` tags is disabled.
+
+- __Sponsored mode__: For the parser, a default set of URI schemes is enabled (`http`, `https`, `irc`, and `mailto`). For the renderer, `rel="nofollow ugc"` is added to all links.
+
+- __User-generated content__: For the parser, (a) embedded HTML is disabled, and (b) all URI schemes are disabled. For the renderer, `rel="nofollow ugc"` is added to all links.
+
+To make changes to these default settings:
+- You may alter the keyset of allowed URI schemes by calling the Parser function `setAllowedURISchemes()`.
+- You may enable embedded HTML by calling the Parser function `enableHTML_UNSAFE()`. __N.B.: For complete compatibility with GitHub Flavored Markdown, support for embedded HTML must be enabled.__ 
+- You may disable image filtering by calling the Renderer function `disableImageFiltering()`.
+- You may add `rel="nofollow ugc"` to all links by calling the Renderer function `addNoFollowUGCAllLinks()`.
 
 If you are re-using contexts to render multiple independent snippets, you will need to call `->resetFileData()` on the context.
 
