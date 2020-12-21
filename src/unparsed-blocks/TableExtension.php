@@ -105,7 +105,7 @@ class TableExtension extends LeafBlock implements BlockProducer {
         $data[] = Vec\take($row, $column_count);
         continue;
       }
-      assert($count < $column_count);
+      invariant($count < $column_count, 'should have `continue;`-d');
       $data[] = Vec\concat(
         $row,
         Vec\fill($column_count - $count, ''),
