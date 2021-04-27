@@ -12,7 +12,6 @@ namespace Facebook\Markdown;
 
 use type Facebook\Markdown\Blocks\TableExtensionColumnAlignment;
 use namespace HH\Lib\{C, Math, Str, Vec};
-use type HH\Lib\Ref;
 
 /** Re-create Markdown from the AST */
 class MarkdownRenderer extends Renderer<string> {
@@ -25,26 +24,26 @@ class MarkdownRenderer extends Renderer<string> {
   <<__Override>>
   protected function renderNodes(vec<ASTNode> $nodes): string {
     $this->outContext = '';
-    $ref_for_out_context = new Ref('');
-    try {
-      return $nodes
-        |> Vec\map(
-          $$,
-          $node ==> {
-            $content = $this->render($node);
-            if ($node is Blocks\Block) {
-              $content = $content."\n\n";
-            }
-            $ref_for_out_context->value .= $content;
-            return $content;
-          },
-        )
-        |> Vec\filter($$, $line ==> $line !== '')
-        |> Str\join($$, '')
-        |> Str\strip_suffix($$, "\n\n");
-    } finally {
-      $this->outContext = $ref_for_out_context->value;
-    }
+    return $nodes
+      |> Vec\map(
+        $$,
+        $node ==> {
+          $content = $this->render($node);
+          if ($node is Blocks\Block) {
+            $content = $content."\n\n";
+          }
+          invariant(
+            $this->outContext is nonnull,
+            'OutContext is set before this mapping. '.
+            'We can not postpone this append, there is a reader in $this->render().',
+          );
+          $this->outContext .= $content;
+          return $content;
+        },
+      )
+      |> Vec\filter($$, $line ==> $line !== '')
+      |> Str\join($$, '')
+      |> Str\strip_suffix($$, "\n\n");
   }
 
   <<__Override>>
@@ -210,10 +209,7 @@ class MarkdownRenderer extends Renderer<string> {
     $this->numberOfLists++;
     $this_list = $this->numberOfLists;
     return $node->getItems()
-      |> Vec\map(
-        $$,
-        $item ==> $this->renderListItem($this_list, $node, $item),
-      )
+      |> Vec\map($$, $item ==> $this->renderListItem($this_list, $node, $item))
       |> Str\join($$, "\n");
   }
 
