@@ -12,6 +12,7 @@ namespace Facebook\Markdown;
 
 use type Facebook\Markdown\Blocks\TableExtensionColumnAlignment;
 use namespace HH\Lib\{C, Math, Str, Vec};
+use type HH\Lib\Ref;
 
 /** Re-create Markdown from the AST */
 class MarkdownRenderer extends Renderer<string> {
@@ -24,21 +25,26 @@ class MarkdownRenderer extends Renderer<string> {
   <<__Override>>
   protected function renderNodes(vec<ASTNode> $nodes): string {
     $this->outContext = '';
-    return $nodes
-      |> Vec\map(
-        $$,
-        $node ==> {
-          $content = $this->render($node);
-          if ($node is Blocks\Block) {
-            $content = $content."\n\n";
-          }
-          $this->outContext .= $content;
-          return $content;
-        },
-      )
-      |> Vec\filter($$, $line ==> $line !== '')
-      |> Str\join($$, '')
-      |> Str\strip_suffix($$, "\n\n");
+    $ref_for_out_context = new Ref('');
+    try {
+      return $nodes
+        |> Vec\map(
+          $$,
+          $node ==> {
+            $content = $this->render($node);
+            if ($node is Blocks\Block) {
+              $content = $content."\n\n";
+            }
+            $ref_for_out_context->value .= $content;
+            return $content;
+          },
+        )
+        |> Vec\filter($$, $line ==> $line !== '')
+        |> Str\join($$, '')
+        |> Str\strip_suffix($$, "\n\n");
+    } finally {
+      $this->outContext = $ref_for_out_context->value;
+    }
   }
 
   <<__Override>>
@@ -67,7 +73,7 @@ class MarkdownRenderer extends Renderer<string> {
       $info = ' '.$info;
     }
 
-    return $separator.$info."\n".$node->getCode()."\n".$separator;
+    return $separator.($info ?? '')."\n".$node->getCode()."\n".$separator;
   }
 
   <<__Override>>
