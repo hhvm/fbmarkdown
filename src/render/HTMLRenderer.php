@@ -244,7 +244,7 @@ class HTMLRenderer extends Renderer<string> {
       if ($alignment !== null) {
         $alignment = ' align="'.$alignment.'"';
       }
-      $html .= '<th'.$alignment.'>'.$this->renderNodes($cell)."</th>\n";
+      $html .= '<th'.($alignment ?? '').'>'.$this->renderNodes($cell)."</th>\n";
     }
     $html .= "</tr>\n</thead>";
     return $html;
@@ -275,7 +275,7 @@ class HTMLRenderer extends Renderer<string> {
     if ($alignment !== null) {
       $alignment = ' align="'.$alignment.'"';
     }
-    return "<td".$alignment.'>'.$this->renderNodes($cell)."</td>";
+    return "<td".($alignment ?? '').'>'.$this->renderNodes($cell)."</td>";
   }
 
   <<__Override>>
@@ -331,7 +331,7 @@ class HTMLRenderer extends Renderer<string> {
       |> Str\join($$, '');
     // Needs to always be present for spec tests to pass
     $alt = ' alt="'.self::escapeAttribute($text).'"';
-    return '<img src="'.$src.'"'.$alt.$title.' />';
+    return '<img src="'.$src.'"'.$alt.($title ?? '').' />';
   }
 
   <<__Override>>
@@ -347,7 +347,7 @@ class HTMLRenderer extends Renderer<string> {
     $noFollowUgcTag = $this->getContext()->areLinksNoFollowUGC()
       ? ' rel="nofollow ugc"'
       : '';
-    return '<a href="'.$href.'"'.$noFollowUgcTag."".$title.'>'.$text.'</a>';
+    return '<a href="'.$href.'"'.$noFollowUgcTag."".($title ?? '').'>'.$text.'</a>';
   }
 
   <<__Override>>

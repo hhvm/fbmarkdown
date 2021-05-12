@@ -32,6 +32,11 @@ class MarkdownRenderer extends Renderer<string> {
           if ($node is Blocks\Block) {
             $content = $content."\n\n";
           }
+          invariant(
+            $this->outContext is nonnull,
+            'OutContext is set before this mapping. '.
+            'We can not postpone this append, there is a reader in $this->render().',
+          );
           $this->outContext .= $content;
           return $content;
         },
@@ -67,7 +72,7 @@ class MarkdownRenderer extends Renderer<string> {
       $info = ' '.$info;
     }
 
-    return $separator.$info."\n".$node->getCode()."\n".$separator;
+    return $separator.($info ?? '')."\n".$node->getCode()."\n".$separator;
   }
 
   <<__Override>>
@@ -204,10 +209,7 @@ class MarkdownRenderer extends Renderer<string> {
     $this->numberOfLists++;
     $this_list = $this->numberOfLists;
     return $node->getItems()
-      |> Vec\map(
-        $$,
-        $item ==> $this->renderListItem($this_list, $node, $item),
-      )
+      |> Vec\map($$, $item ==> $this->renderListItem($this_list, $node, $item))
       |> Str\join($$, "\n");
   }
 
