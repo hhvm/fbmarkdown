@@ -1,4 +1,5 @@
 # FBMarkdown
+
 FBMarkdown is an extensible parser and renderer for [GitHub Flavored Markdown](https://github.github.com/gfm/),
 written in [Hack](http://hacklang.org).
 
@@ -22,26 +23,24 @@ FBMarkdown exists to address all of these goals.
 
 ## Requirements
 
-- HHVM 3.24 or above.
+- HHVM 3.56 or above.
 - [hhvm-autoload](https://github.com/hhvm/hhvm-autoload)
 
 ## Installing FBMarkdown
 
-    hhvm composer.phar require facebook/fbmarkdown
+```sh
+composer require facebook/fbmarkdown
+```
 
 ## Using FBMarkdown
 
-```Hack
+```hack
 use namespace Facebook\Markdown;
 
 function render(string $markdown): string {
-  $ast = Markdown\parse(new Markdown\ParserContext(), $markdown);
+  $environment = Markdown\html_environment();
 
-  $html = (new Markdown\HTMLRenderer(
-    new Markdown\RenderContext()
-  ))->render($ast);
-
-  return $html;
+  return $environment->convert($markdown);
 }
 ```
 
@@ -54,8 +53,9 @@ FBMarkdown currently supports three types of Markdown sources, with plans to exp
 - __User-generated content__: All HTML is disabled, as are links and images regardless of schemes. If links are re-enabled, `rel="nofollow ugc"` will be added to all links.
 
 To make changes to these default settings:
+
 - You may alter the keyset of allowed URI schemes by calling the Parser function `setAllowedURISchemes()`.
-- You may enable embedded HTML by calling the Parser function `enableHTML_UNSAFE()`. __N.B.: For complete compatibility with GitHub Flavored Markdown, support for embedded HTML must be enabled.__ 
+- You may enable embedded HTML by calling the Parser function `enableHTML_UNSAFE()`. __N.B.: For complete compatibility with GitHub Flavored Markdown, support for embedded HTML must be enabled.__
 - You may disable image filtering by calling the Renderer function `disableImageFiltering()`.
 - You may add `rel="nofollow ugc"` to all links by calling the Renderer function `addNoFollowUGCAllLinks()`.
 
@@ -89,10 +89,11 @@ Extend `Facebook\Markdown\Inlines\Inline` or a subclass, and pass your classname
 `$render_ctx->getInlineContext()->prependInlineTypes(...)`.
 
 There are then several approaches to rendering:
- - instantiate your subclass, and add support for it to a custom renderer
- - instantiate your subclass, and make it implement the `Facebook\Markdown\RenderableAsHTML` interface
- - if it could be replaced with several existing inlines, return a
-   `Facebook\Markdown\Inlines\InlineSequence`, then you won't need to extend the renderer.
+
+- instantiate your subclass, and add support for it to a custom renderer
+- instantiate your subclass, and make it implement the `Facebook\Markdown\RenderableAsHTML` interface
+- if it could be replaced with several existing inlines, return a
+  `Facebook\Markdown\Inlines\InlineSequence`, then you won't need to extend the renderer.
 
 #### Blocks
 
@@ -100,15 +101,39 @@ You will need to implement the `Facebook\Markdown\UnparsedBlocks\BlockProducer` 
 to `$render_ctx->getBlockContext()->prependBlockTypes(...)`.
 
 There are then several approaches to rendering:
- - create a subclass of `Block`, and add support for it to a custom renderer
- - create a subclass of `Block`, and make it implement the `Facebook\Markdown\RenderableAsHTML` interface
- - if it could be replaced with several existing blocks, return a
-   `Facebook\Markdown\Blocks\BlockSequence`
- - if it could be replaced with a paragraph of inlines, return a `Facebook\Markdown\Blocks\InlineSequenceBlock`
+
+- create a subclass of `Block`, and add support for it to a custom renderer
+- create a subclass of `Block`, and make it implement the `Facebook\Markdown\RenderableAsHTML` interface
+- if it could be replaced with several existing blocks, return a
+  `Facebook\Markdown\Blocks\BlockSequence`
+- if it could be replaced with a paragraph of inlines, return a `Facebook\Markdown\Blocks\InlineSequenceBlock`
 
 ### Transforming The AST
 
 Extend `Facebook\Markdown\RenderFilter`, and pass it to `$render_ctx->appendFilters(...)`.
+
+## FBMarkdown Environment
+
+FBMarkdown provides a `Environment` class which acts as a glow between the parser and renderer.
+
+By default, FBMarkdown ships with 2 functions which allow you to create an HTML environment, and unsafe HTML environment.
+
+- `Facebook\Markdown\html_environment`
+- `Facebook\Markdown\unsafe_html_environment`
+
+The `Environment` makes it easy to extend the parser, and renderer via the `Plugin` system.
+
+```hack
+$environment = Markdown\html_environment();
+
+$environment->use(new UserMentionPlugin());
+$environment->user(new ExternalLinkPlugin());
+
+$html = $environment->convert($markdown);
+```
+
+each plugin must extend the `Facebook\Markdown\Plugin` class, and can provide
+multiple [block producers](#blocks), [inline types](#inlines), and [render filters](#transforming-the-ast).
 
 ### Examples
 
