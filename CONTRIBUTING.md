@@ -7,13 +7,13 @@ The code of conduct is described in [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md).
 
 ## Our Development Process
 
-We develop on master, and make releases on an as-needed basic - usually
+We develop on main, and make releases on an as-needed basic - usually
 to support new HHVM releases.
 
 ## Pull Requests
 We actively welcome your pull requests.
 
-1. Fork the repo and create your branch from `master`.
+1. Fork the repo and create your branch from `main`.
 2. If you've added code that should be tested, add tests.
 3. If you've changed APIs, update the documentation.
 4. Ensure the test suite passes.
