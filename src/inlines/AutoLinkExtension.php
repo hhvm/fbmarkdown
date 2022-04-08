@@ -20,7 +20,12 @@ class AutoLinkExtension extends AutoLink {
   const string PREFIX = 'www\.|'.self::SCHEME.'|'.self::EMAIL;
 
   const keyset<string> MUST_FOLLOW = keyset[
-    "\n", ' ', '*', '_', '~', '(',
+    "\n",
+    ' ',
+    '*',
+    '_',
+    '~',
+    '(',
   ];
 
   <<__Override>>
@@ -35,15 +40,14 @@ class AutoLinkExtension extends AutoLink {
     int $offset,
   ): ?(Inline, int) {
     if (
-      $offset > 0
-      && !C\contains_key(self::MUST_FOLLOW, $markdown[$offset - 1])
+      $offset > 0 && !C\contains_key(self::MUST_FOLLOW, $markdown[$offset - 1])
     ) {
       return null;
     }
 
     $string = Str\slice($markdown, $offset);
 
-    $matches = darray[];
+    $matches = dict[];
     $result = \preg_match_with_matches(
       '/^(?<prefix>'.self::PREFIX.')(?<domain>'.self::DOMAIN.')/i',
       $string,
@@ -66,30 +70,28 @@ class AutoLinkExtension extends AutoLink {
     if (Str\lowercase($prefix) === 'www.') {
       list($path, $offset) = self::consumePath($markdown, $offset);
       $text = $prefix.$domain.$path;
-      return tuple(
-        new self($text, 'http://'.$text),
-        $offset,
-      );
+      return tuple(new self($text, 'http://'.$text), $offset);
     }
     if (Str\ends_with($prefix, '://')) {
       list($path, $offset) = self::consumePath($markdown, $offset);
       $text = $prefix.$domain.$path;
-      return tuple(
-        new self($text, $text),
-        $offset,
-      );
+      return tuple(new self($text, $text), $offset);
     }
 
     // email
-    return tuple(
-      new self($full, 'mailto:'.$full),
-      $offset,
-    );
+    return tuple(new self($full, 'mailto:'.$full), $offset);
   }
 
   // From GFM spec
   const keyset<string> TRAILING_PUNCTUATION = keyset[
-    '?', '!', '.', ',', ':', '*', '_', '~',
+    '?',
+    '!',
+    '.',
+    ',',
+    ':',
+    '*',
+    '_',
+    '~',
   ];
 
   private static function consumePath(
@@ -132,11 +134,7 @@ class AutoLinkExtension extends AutoLink {
     if ($last === ';') {
       $idx = Str\search_last($match, '&');
       if ($idx !== null) {
-        $slice = Str\slice(
-          $match,
-          $idx + 1,
-          $len -  ($idx + 2),
-        );
+        $slice = Str\slice($match, $idx + 1, $len - ($idx + 2));
         if (\ctype_alnum($slice)) {
           $match = Str\slice($match, 0, $idx);
           if ($match === '') {

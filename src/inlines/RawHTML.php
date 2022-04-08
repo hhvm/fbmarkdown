@@ -15,9 +15,7 @@ use namespace HH\Lib\Str;
 
 <<__ConsistentConstruct>>
 class RawHTML extends Inline {
-  public function __construct(
-    private string $content,
-  ) {
+  public function __construct(private string $content) {
   }
 
   public function getContent(): string {
@@ -31,10 +29,7 @@ class RawHTML extends Inline {
 
   // From the GFM spec
   const string OPEN_TAG =
-    '<'.HTMLBlock::TAG_NAME.
-    '('.HTMLBlock::ATTRIBUTE.')*'.
-    '\\s*'.
-    '\\/?>';
+    '<'.HTMLBlock::TAG_NAME.'('.HTMLBlock::ATTRIBUTE.')*'.'\\s*'.'\\/?>';
   const string CLOSING_TAG = '<\\/'.HTMLBlock::TAG_NAME.'\\s*>';
   const string DECLARATION = '<![A-Z]+\\s+[^>]+>';
 
@@ -53,26 +48,23 @@ class RawHTML extends Inline {
 
     $slice = Str\slice($string, $offset);
 
-    $matches = darray[];
+    $matches = dict[];
     if (
       \preg_match_with_matches(
         '/^('.self::OPEN_TAG.'|'.self::CLOSING_TAG.'|'.self::DECLARATION.')/i',
         $slice,
         inout $matches,
-      ) === 1
+      ) ===
+        1
     ) {
       $match = $matches[0];
       $offset += Str\length($match);
-      return tuple(
-        new self($match),
-        $offset,
-      );
+      return tuple(new self($match), $offset);
     }
 
-    return
-      self::consumeHtmlComment($string, $offset)
-      ?? self::consumeProcessingInstruction($string, $offset)
-      ?? self::consumeCDataSection($string, $offset);
+    return self::consumeHtmlComment($string, $offset) ??
+      self::consumeProcessingInstruction($string, $offset) ??
+      self::consumeCDataSection($string, $offset);
   }
 
   private static function consumeHtmlComment(
