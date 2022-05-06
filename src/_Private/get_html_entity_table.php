@@ -27,5 +27,8 @@ function get_html_entity_table(): dict<string, string> {
     \JSON_FB_HACK_ARRAYS,
   );
 
-  return Dict\map($data, $x ==> $x['characters']);
+  return Dict\map(
+    $data,
+    (KeyedContainer<arraykey, mixed> $x) ==> $x['characters'] as string,
+  );
 }
