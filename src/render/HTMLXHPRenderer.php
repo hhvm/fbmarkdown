@@ -330,8 +330,7 @@ class HTMLXHPRenderer extends Renderer<XHP\Core\node> {
 
   <<__Override>>
   protected function renderEmphasis(Inlines\Emphasis $node): XHP\Core\node {
-    $children = Vec\map($node->getContent(), $item ==> $this->render($item))
-      |> _Private\xhp_join($$);
+    $children = Vec\map($node->getContent(), $item ==> $this->render($item));
     return
       $node->isStrong() ? <strong>{$children}</strong> : <em>{$children}</em>;
   }
@@ -363,8 +362,7 @@ class HTMLXHPRenderer extends Renderer<XHP\Core\node> {
     $href = _Private\escape_uri_attribute($node->getDestination());
 
     $text = $node->getText()
-      |> Vec\map($$, $child ==> $this->render($child))
-      |> _Private\xhp_join($$);
+      |> Vec\map($$, $child ==> $this->render($child));
 
     $donor = <a />;
     $donor->forceAttribute_DEPRECATED('href', $href);
@@ -388,7 +386,6 @@ class HTMLXHPRenderer extends Renderer<XHP\Core\node> {
   ): XHP\Core\node {
     return $node->getChildren()
       |> Vec\map($$, $child ==> $this->render($child))
-      |> _Private\xhp_join($$)
       |> <del>{$$}</del>;
   }
 }
