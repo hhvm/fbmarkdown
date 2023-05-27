@@ -8,7 +8,7 @@
  *
  */
 
-namespace Facebook\Markdown\UnparsedBlocks\_Private;;
+namespace Facebook\Markdown\UnparsedBlocks\_Private;
 
 use type Facebook\Markdown\UnparsedBlocks\{BlockProducer, Context, Lines};
 use namespace HH\Lib\C;
