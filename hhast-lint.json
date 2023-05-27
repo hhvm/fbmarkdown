@@ -5,6 +5,7 @@
   ],
   "builtinLinters": "all",
   "disabledLinters": [
-    "Facebook\\HHAST\\FinalOrAbstractClassLinter"
+    "Facebook\\HHAST\\FinalOrAbstractClassLinter",
+    "Facebook\\HHAST\\UseStatementWithAsLinter"
   ]
 }
