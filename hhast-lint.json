@@ -3,5 +3,8 @@
     "src/",
     "tests/"
   ],
-  "builtinLinters": "all"
+  "builtinLinters": "all",
+  "disabledLinters": [
+    "Facebook\\HHAST\\FinalOrAbstractClassLinter"
+  ]
 }
