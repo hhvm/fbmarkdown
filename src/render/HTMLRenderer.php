@@ -11,6 +11,7 @@
 namespace Facebook\Markdown;
 
 use namespace HH\Lib\{C, Str, Vec};
+use namespace HH\Asio;
 
 class HTMLRenderer extends Renderer<string> {
   const keyset<classname<RenderFilter>> EXTENSIONS = keyset[
@@ -68,8 +69,10 @@ class HTMLRenderer extends Renderer<string> {
   protected function renderResolvedNode(ASTNode $node): string {
     if ($node is RenderableAsXHP) {
       $xhp_renderer = new HTMLXHPRenderer($this->getContext());
-      return $node->renderAsXHP($this->getContext(), $xhp_renderer)
-        |> _Private\FORCE_RENDER($$);
+      // HHAST_IGNORE_ERROR[DontUseAsioJoin]
+      return Asio\join(
+        $node->renderAsXHP($this->getContext(), $xhp_renderer)->toStringAsync(),
+      );
     }
 
     // This interface is implemented by users of this library.
