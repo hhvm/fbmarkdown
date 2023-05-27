@@ -12,7 +12,7 @@ namespace Facebook\Markdown;
 
 use namespace HH\Lib\C;
 
-abstract class Renderer<T> {
+abstract class Renderer<T> implements IRenderer<T> {
   public function __construct(
     private RenderContext $context,
   ) {

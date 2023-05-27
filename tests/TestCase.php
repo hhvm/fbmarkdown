@@ -12,6 +12,7 @@ namespace Facebook\Markdown;
 
 use namespace HH\Lib\Str;
 use function Facebook\FBExpect\expect;
+use type XHPChild;
 
 abstract class TestCase extends \Facebook\HackTest\HackTest {
   const string TAB_REPLACEMENT = "\u{2192}";
@@ -19,6 +20,14 @@ abstract class TestCase extends \Facebook\HackTest\HackTest {
     ' checked ' => ' checked="" ',
     ' disabled ' => ' disabled="" ',
   ];
+
+  protected function providerHTMLRendererConstructors()[]: vec<(function(
+    RenderContext,
+  ): IRenderer<XHPChild>)> {
+    return vec[
+      ($ctx)[defaults] ==> new HTMLRenderer($ctx),
+    ];
+  }
 
   final protected function assertExampleMatches(
     string $name,
