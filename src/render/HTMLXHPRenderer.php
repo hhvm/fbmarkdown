@@ -13,6 +13,23 @@ namespace Facebook\Markdown;
 use namespace HH\Lib\{C, Str, Vec};
 use namespace Facebook\XHP;
 use type Facebook\XHP\Core\frag;
+use type Facebook\XHP\HTML\{
+  blockquote,
+  br,
+  code,
+  del,
+  em,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  hr,
+  p,
+  strong,
+};
+use type Facebook\Markdown\_Private\td_with_align;
 
 class HTMLXHPRenderer extends Renderer<XHP\Core\node> {
   const keyset<classname<RenderFilter>> EXTENSIONS = keyset[
@@ -93,9 +110,7 @@ class HTMLXHPRenderer extends Renderer<XHP\Core\node> {
   protected function renderBlockQuote(Blocks\BlockQuote $node): XHP\Core\node {
     return $node->getChildren()
       |> $this->renderNodes($$)
-      |> _Private\FORCE_RENDER($$)
-      |> "<blockquote>\n".$$."</blockquote>\n"
-      |> _Private\DO_NOT_ESCAPE($$);
+      |> <frag><blockquote>{"\n"}{$$}</blockquote>{"\n"}</frag>;
   }
 
   <<__Override>>
@@ -116,12 +131,21 @@ class HTMLXHPRenderer extends Renderer<XHP\Core\node> {
 
   <<__Override>>
   protected function renderHeading(Blocks\Heading $node): XHP\Core\node {
-    $level = $node->getLevel();
-    return $node->getHeading()
-      |> $this->renderNodes($$)
-      |> _Private\FORCE_RENDER($$)
-      |> \sprintf("<h%d>%s</h%d>\n", $level, $$, $level)
-      |> _Private\DO_NOT_ESCAPE($$);
+    $children = $this->renderNodes($node->getHeading());
+    switch ($node->getLevel()) {
+      case 1:
+        return <frag><h1>{$children}</h1>{"\n"}</frag>;
+      case 2:
+        return <frag><h2>{$children}</h2>{"\n"}</frag>;
+      case 3:
+        return <frag><h3>{$children}</h3>{"\n"}</frag>;
+      case 4:
+        return <frag><h4>{$children}</h4>{"\n"}</frag>;
+      case 5:
+        return <frag><h5>{$children}</h5>{"\n"}</frag>;
+      case 6:
+        return <frag><h6>{$children}</h6>{"\n"}</frag>;
+    }
   }
 
   <<__Override>>
@@ -231,10 +255,7 @@ class HTMLXHPRenderer extends Renderer<XHP\Core\node> {
 
   <<__Override>>
   protected function renderParagraph(Blocks\Paragraph $node): XHP\Core\node {
-    return '<p>'.
-      _Private\FORCE_RENDER($this->renderNodes($node->getContents())).
-      "</p>\n"
-      |> _Private\DO_NOT_ESCAPE($$);
+    return <frag><p>{$this->renderNodes($node->getContents())}</p>{"\n"}</frag>;
   }
 
   <<__Override>>
@@ -302,21 +323,15 @@ class HTMLXHPRenderer extends Renderer<XHP\Core\node> {
     int $col_idx,
     Blocks\TableExtension::TCell $cell,
   ): XHP\Core\node {
-    $alignment = $table->getColumnAlignments()[$col_idx];
-    if ($alignment !== null) {
-      $alignment = ' align="'.$alignment.'"';
-    }
-    return '<td'.
-      ($alignment ?? '').
-      '>'.
-      _Private\FORCE_RENDER($this->renderNodes($cell)).
-      '</td>'
-      |> _Private\DO_NOT_ESCAPE($$);
+    $align =
+      $table->getColumnAlignments()[$col_idx] |> $$ is null ? null : $$.'';
+    return
+      <td_with_align align={$align}>{$this->renderNodes($cell)}</td_with_align>;
   }
 
   <<__Override>>
   protected function renderThematicBreak(): XHP\Core\node {
-    return "<hr />\n" |> _Private\DO_NOT_ESCAPE($$);
+    return <frag><hr />{"\n"}</frag>;
   }
 
   <<__Override>>
@@ -333,29 +348,25 @@ class HTMLXHPRenderer extends Renderer<XHP\Core\node> {
   protected function renderInlineWithPlainTextContent(
     Inlines\InlineWithPlainTextContent $node,
   ): XHP\Core\node {
-    return
-      self::escapeContent($node->getContent()) |> _Private\DO_NOT_ESCAPE($$);
+    return <frag>{$node->getContent()}</frag>;
   }
 
   <<__Override>>
   protected function renderCodeSpan(Inlines\CodeSpan $node): XHP\Core\node {
-    return '<code>'.self::escapeContent($node->getCode()).'</code>'
-      |> _Private\DO_NOT_ESCAPE($$);
+    return <code>{$node->getCode()}</code>;
   }
 
   <<__Override>>
   protected function renderEmphasis(Inlines\Emphasis $node): XHP\Core\node {
-    $tag = $node->isStrong() ? 'strong' : 'em';
-    return $node->getContent()
-      |> Vec\map($$, $item ==> _Private\FORCE_RENDER($this->render($item)))
-      |> Str\join($$, '')
-      |> '<'.$tag.'>'.$$.'</'.$tag.'>'
-      |> _Private\DO_NOT_ESCAPE($$);
+    $children = Vec\map($node->getContent(), $item ==> $this->render($item))
+      |> _Private\xhp_join($$);
+    return
+      $node->isStrong() ? <strong>{$children}</strong> : <em>{$children}</em>;
   }
 
   <<__Override>>
   protected function renderHardLineBreak(): XHP\Core\node {
-    return "<br />\n" |> _Private\DO_NOT_ESCAPE($$);
+    return <frag><br />{"\n"}</frag>;
   }
 
   <<__Override>>
@@ -394,22 +405,21 @@ class HTMLXHPRenderer extends Renderer<XHP\Core\node> {
 
   <<__Override>>
   protected function renderRawHTML(Inlines\RawHTML $node): XHP\Core\node {
-    return $node->getContent() |> _Private\DO_NOT_ESCAPE($$);
+    return _Private\DO_NOT_ESCAPE($node->getContent());
   }
 
   <<__Override>>
   protected function renderSoftLineBreak(): XHP\Core\node {
-    return "\n" |> _Private\DO_NOT_ESCAPE($$);
+    return <frag>{"\n"}</frag>;
   }
 
   <<__Override>>
   protected function renderStrikethroughExtension(
     Inlines\StrikethroughExtension $node,
   ): XHP\Core\node {
-    $children = $node->getChildren()
+    return $node->getChildren()
       |> Vec\map($$, $child ==> $this->render($child))
       |> _Private\xhp_join($$)
-      |> _Private\FORCE_RENDER($$);
-    return '<del>'.$children.'</del>' |> _Private\DO_NOT_ESCAPE($$);
+      |> <del>{$$}</del>;
   }
 }

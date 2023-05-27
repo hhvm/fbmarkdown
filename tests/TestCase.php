@@ -17,9 +17,19 @@ use type XHPChild;
 
 abstract class TestCase extends \Facebook\HackTest\HackTest {
   const string TAB_REPLACEMENT = "\u{2192}";
-  const dict<string, string> BOOLEAN_ATTRIBUTE_REPLACEMENTS = dict[
+
+  // Facebook\XHP has some behaviors that are not compatible with the specs.
+  // Boolean attributes with the `true` value are rendered as `attr`, but the
+  // specs contain `attr=""` everywhere. In HTML4.01 and HTML5, `attr` is valid.
+  //
+  // Void elements ought to be rendered without a trailing solidus in their opening tag.
+  // `<br />` is "corrected" to `<br>` anyhow.
+  // XHP does the HTML5 spec compliant thing and doesn't include the trailing solidus.
+  const dict<string, string> SLIGHT_DEVIATIONS_FROM_SPEC = dict[
     ' checked ' => ' checked="" ',
     ' disabled ' => ' disabled="" ',
+    "<br>\n" => "<br />\n",
+    "<hr>\n" => "<hr />\n",
   ];
 
   public function provideHTMLRendererConstructors(
@@ -78,7 +88,7 @@ abstract class TestCase extends \Facebook\HackTest\HackTest {
       $actual_html = await static::unsafeStringifyXHPChildAsync(
         $constructor($render_ctx)->render($ast),
       )
-        |> self::addEmptyStringsForBooleanAttributes($$);
+        |> self::correctForSpecDeviations($$);
 
       // Improve output readability
       $actual_html = Str\replace($actual_html, "\t", self::TAB_REPLACEMENT);
@@ -94,9 +104,7 @@ abstract class TestCase extends \Facebook\HackTest\HackTest {
     }
   }
 
-  private static function addEmptyStringsForBooleanAttributes(
-    string $html,
-  )[]: string {
-    return Str\replace_every($html, static::BOOLEAN_ATTRIBUTE_REPLACEMENTS);
+  private static function correctForSpecDeviations(string $html)[]: string {
+    return Str\replace_every($html, static::SLIGHT_DEVIATIONS_FROM_SPEC);
   }
 }
