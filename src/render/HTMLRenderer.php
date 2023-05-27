@@ -26,35 +26,8 @@ class HTMLRenderer extends Renderer<string> {
     return _Private\plain_text_to_html_attribute($text);
   }
 
-  // This is the list from the reference implementation
-  //hackfmt-ignore
-  const keyset<string> URI_SAFE = keyset[
-    '-', '_', '.', '+', '!', '*', "'", '(', ')', ';', ':', '%', '#', '@', '?',
-    '=', ';', ':', '/', ',', '+', '&', '$',
-    'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
-    'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
-    'u', 'v', 'w', 'x', 'y', 'z',
-    '1', '2', '3', '4', '5', '6', '7', '8', '9', '0',
-  ];
-
   protected static function escapeURIAttribute(string $text): string {
-    // While the spec states that no particular method is required, we attempt
-    // to match cmark's behavior so that we can run the spec test suite.
-    $text = \html_entity_decode($text, \ENT_HTML5, 'UTF-8');
-
-    $out = '';
-    $len = Str\length($text);
-    for ($i = 0; $i < $len; ++$i) {
-      $char = $text[$i];
-      if (C\contains_key(self::URI_SAFE, $char)) {
-        $out .= $char;
-        continue;
-      }
-      $out .= \urlencode($char);
-    }
-    $text = $out;
-
-    return self::escapeAttribute($text);
+    return _Private\escape_uri_attribute($text)->toHTMLString();
   }
 
   <<__Override>>

@@ -46,45 +46,6 @@ class HTMLXHPRenderer extends Renderer<XHP\Core\node> {
     TagFilterExtension::class,
   ];
 
-  protected static function escapeContent(string $text): string {
-    return _Private\plain_text_to_html($text);
-  }
-
-  protected static function escapeAttribute(string $text): string {
-    return _Private\plain_text_to_html_attribute($text);
-  }
-
-  // This is the list from the reference implementation
-  //hackfmt-ignore
-  const keyset<string> URI_SAFE = keyset[
-    '-', '_', '.', '+', '!', '*', "'", '(', ')', ';', ':', '%', '#', '@', '?',
-    '=', ';', ':', '/', ',', '+', '&', '$',
-    'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
-    'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
-    'u', 'v', 'w', 'x', 'y', 'z',
-    '1', '2', '3', '4', '5', '6', '7', '8', '9', '0',
-  ];
-
-  protected static function escapeURIAttribute(string $text): string {
-    // While the spec states that no particular method is required, we attempt
-    // to match cmark's behavior so that we can run the spec test suite.
-    $text = \html_entity_decode($text, \ENT_HTML5, 'UTF-8');
-
-    $out = '';
-    $len = Str\length($text);
-    for ($i = 0; $i < $len; ++$i) {
-      $char = $text[$i];
-      if (C\contains_key(self::URI_SAFE, $char)) {
-        $out .= $char;
-        continue;
-      }
-      $out .= \urlencode($char);
-    }
-    $text = $out;
-
-    return self::escapeAttribute($text);
-  }
-
   <<__Override>>
   protected function renderNodes(vec<ASTNode> $nodes): XHP\Core\node {
     return $nodes
@@ -346,12 +307,12 @@ class HTMLXHPRenderer extends Renderer<XHP\Core\node> {
 
   <<__Override>>
   protected function renderAutoLink(Inlines\AutoLink $node): XHP\Core\node {
-    // @see escapeURIAttribute for why we need to evade xhp's attribute escaping here.
-    $href = self::escapeURIAttribute($node->getDestination())
-      |> _Private\DO_NOT_ESCAPE_ATTRIBUTE($$);
+    $href = _Private\escape_uri_attribute($node->getDestination());
     $rel = $this->getContext()->areLinksNoFollowUGC() ? 'nofollow ugc' : null;
 
-    return <a href={$href} rel={$rel}>{$node->getText()}</a>;
+    $donor = <a />;
+    $donor->forceAttribute_DEPRECATED('href', $href);
+    return <a {...$donor} rel={$rel}>{$node->getText()}</a>;
   }
 
   <<__Override>>
@@ -382,12 +343,15 @@ class HTMLXHPRenderer extends Renderer<XHP\Core\node> {
   <<__Override>>
   protected function renderImage(Inlines\Image $node): XHP\Core\node {
     $title = $node->getTitle();
-    $src = self::escapeURIAttribute($node->getSource());
+    $src = _Private\escape_uri_attribute($node->getSource());
     // Needs to always be present for spec tests to pass
     $alt = $node->getDescription()
       |> Vec\map($$, $child ==> $child->getContentAsPlainText())
       |> Str\join($$, '');
-    return <img src={$src} alt={$alt} title={$title} />;
+
+    $donor = <img />;
+    $donor->forceAttribute_DEPRECATED('src', $src);
+    return <img {...$donor} alt={$alt} title={$title} />;
   }
 
   <<__Override>>
@@ -395,15 +359,15 @@ class HTMLXHPRenderer extends Renderer<XHP\Core\node> {
     $title = $node->getTitle();
     $rel = $this->getContext()->areLinksNoFollowUGC() ? 'nofollow ugc' : null;
 
-    // @see escapeURIAttribute for why we need to evade xhp's attribute escaping here.
-    $href = self::escapeURIAttribute($node->getDestination())
-      |> _Private\DO_NOT_ESCAPE_ATTRIBUTE($$);
+    $href = _Private\escape_uri_attribute($node->getDestination());
 
     $text = $node->getText()
       |> Vec\map($$, $child ==> $this->render($child))
       |> _Private\xhp_join($$);
 
-    return <a href={$href} rel={$rel} title={$title}>{$text}</a>;
+    $donor = <a />;
+    $donor->forceAttribute_DEPRECATED('href', $href);
+    return <a {...$donor} rel={$rel} title={$title}>{$text}</a>;
   }
 
   <<__Override>>
