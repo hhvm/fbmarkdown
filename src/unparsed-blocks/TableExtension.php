@@ -142,7 +142,7 @@ class TableExtension extends LeafBlock implements BlockProducer {
     $parts = vec[];
     $start = 0;
     $len = Str\length($first);
-    while ($start !== null && $start < $len) {
+    while ($start < $len) {
       $end = Str\search($first, '|', $start);
       if ($end === null) {
         $parts[] = Str\slice($first, $start);
