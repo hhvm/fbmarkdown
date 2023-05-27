@@ -87,6 +87,7 @@ abstract class TestCase extends \Facebook\HackTest\HackTest {
     $ast = parse($parser_ctx, $in);
     foreach ($this->provideHTMLRendererConstructors() as list($constructor)) {
       using (_Private\disable_child_validation()) {
+        // HHAST_FIXME[DontAwaitInALoop] Suboptimial, but it's test code...
         $actual_html = await static::unsafeStringifyXHPChildAsync(
           $constructor($render_ctx)->render($ast),
         )

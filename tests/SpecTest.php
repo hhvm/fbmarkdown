@@ -112,6 +112,7 @@ final class SpecTest extends TestCase {
     $normalized_ast = parse($parser_ctx, $normalized_md);
     foreach ($this->provideHTMLRendererConstructors() as list($constructor)) {
       using (_Private\disable_child_validation()) {
+        // HHAST_FIXME[DontAwaitInALoop] Suboptimial, but it's test code...
         $actual_html = await static::unsafeStringifyXHPChildAsync(
           $constructor($render_ctx)->render($normalized_ast),
         );

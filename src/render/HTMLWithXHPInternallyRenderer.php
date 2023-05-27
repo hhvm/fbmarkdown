@@ -15,7 +15,6 @@ namespace Facebook\Markdown;
 // HTMLRenderer is a Renderer<string>, so HTMLWithXHPInternallyRenderer is too.
 // This forces us to run the Awaitables in a blocking fashion.
 
-use namespace HH\Lib\{C, Str, Vec};
 use namespace HH\Asio;
 use namespace Facebook\XHP;
 

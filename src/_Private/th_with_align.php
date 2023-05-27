@@ -19,6 +19,7 @@ final xhp class th_with_align extends element implements Category\Sectioning {
   attribute :Facebook:XHP:HTML:th,
     string align;
 
+  <<__Override>>
   protected static function getChildrenDeclaration(): XHPChild\Constraint {
     return XHPChild\any_number_of(
       XHPChild\any_of(XHPChild\pcdata(), XHPChild\of_type<Category\Flow>()),

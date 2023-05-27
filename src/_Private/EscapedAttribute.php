@@ -15,6 +15,7 @@ use namespace Facebook\XHP;
 final class EscapedAttribute extends XHP\UnsafeAttributeValue_DEPRECATED {
   public function __construct(private string $dangerDangerDanger) {}
 
+  <<__Override>>
   public function toHTMLString(): string {
     return $this->dangerDangerDanger;
   }

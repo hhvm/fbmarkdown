@@ -15,11 +15,9 @@ use type Facebook\XHP\AlwaysValidChild;
 use type Facebook\XHP\Core\primitive;
 
 final xhp class trim_node extends primitive implements AlwaysValidChild {
+  <<__Override>>
   public async function stringifyAsync(): Awaitable<string> {
-    return await Vec\map_async(
-      $this->getChildren(),
-      async $c ==> await static::renderChildAsync($c),
-    )
+    return await Vec\map_async($this->getChildren(), static::renderChildAsync<>)
       |> Str\join($$, '')
       |> Str\trim($$);
   }

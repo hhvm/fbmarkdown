@@ -39,6 +39,7 @@ final class NoFollowUgcAndImageTest extends TestCase {
 
     $ast = parse($parser_ctx, $in);
     foreach ($this->provideHTMLRendererConstructors() as list($constructor)) {
+      // HHAST_FIXME[DontAwaitInALoop] Suboptimial, but it's test code...
       $actual_html = await static::unsafeStringifyXHPChildAsync(
         $constructor($render_ctx)->render($ast),
       );

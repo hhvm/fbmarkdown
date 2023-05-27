@@ -109,6 +109,8 @@ class HTMLXHPRenderer extends Renderer<XHP\Core\node> {
         return <frag><h5>{$children}</h5>{"\n"}</frag>;
       case 6:
         return <frag><h6>{$children}</h6>{"\n"}</frag>;
+      default:
+        invariant_violation('<h%d> is not a valid html tag', $node->getLevel());
     }
   }
 
@@ -165,8 +167,6 @@ class HTMLXHPRenderer extends Renderer<XHP\Core\node> {
       return <frag><li>{"\n"}{$this->renderNodes($children)}</li>{"\n"}</frag>;
     }
 
-    $content = '';
-
     return
       <frag>
         <li>
@@ -201,8 +201,10 @@ class HTMLXHPRenderer extends Renderer<XHP\Core\node> {
 
     $start = $node->getFirstNumber();
     switch ($start) {
+      // HHAST_IGNORE_ERROR[5614] Intended this to be a null === ?int comparison
       case null:
         return <frag><ul>{"\n"}{$children}</ul>{"\n"}</frag>;
+      // HHAST_IGNORE_ERROR[5614] No nulls here, because that's the first case.
       case 1:
         return <frag><ol>{"\n"}{$children}</ol>{"\n"}</frag>;
       default:
@@ -271,7 +273,7 @@ class HTMLXHPRenderer extends Renderer<XHP\Core\node> {
 
   protected function renderTableDataRow(
     Blocks\TableExtension $table,
-    int $row_idx,
+    int $_row_idx,
     Blocks\TableExtension::TRow $row,
   ): XHP\Core\node {
     return
