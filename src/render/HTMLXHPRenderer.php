@@ -33,9 +33,13 @@ use type Facebook\XHP\HTML\{
   p,
   pre,
   strong,
+  table,
+  tbody,
+  thead,
+  tr,
   ul,
 };
-use type Facebook\Markdown\_Private\{td_with_align, trim_node};
+use type Facebook\Markdown\_Private\{td_with_align, th_with_align, trim_node};
 
 class HTMLXHPRenderer extends Renderer<XHP\Core\node> {
   const keyset<classname<RenderFilter>> EXTENSIONS = keyset[
@@ -253,59 +257,73 @@ class HTMLXHPRenderer extends Renderer<XHP\Core\node> {
   protected function renderTableExtension(
     Blocks\TableExtension $node,
   ): XHP\Core\node {
-    $html = "<table>\n".$this->renderTableHeader($node);
+    $header = $this->renderTableHeader($node);
 
     $data = $node->getData();
     if (C\is_empty($data)) {
-      return $html."</table>\n" |> _Private\DO_NOT_ESCAPE($$);
+      return <frag><table>{"\n"}{$header}</table>{"\n"}</frag>;
     }
-    $html .= "\n<tbody>";
 
-    $row_idx = -1;
-    foreach ($data as $row) {
-      ++$row_idx;
-      $html .= "\n".$this->renderTableDataRow($node, $row_idx, $row);
-    }
-    return $html."</tbody></table>\n" |> _Private\DO_NOT_ESCAPE($$);
+    return
+      <frag>
+        <table>
+          {"\n"}
+          {$header}
+          {"\n"}
+          <tbody>
+            {Vec\map_with_key(
+              $data,
+              ($i, $row) ==>
+                <frag>{"\n"}{$this->renderTableDataRow($node, $i, $row)}</frag>,
+            )}
+          </tbody>
+        </table>
+        {"\n"}
+      </frag>;
   }
 
-  protected function renderTableHeader(Blocks\TableExtension $node): string {
-    $html = "<thead>\n<tr>\n";
-
+  protected function renderTableHeader(
+    Blocks\TableExtension $node,
+  ): XHP\Core\node {
     $alignments = $node->getColumnAlignments();
-    $header = $node->getHeader();
-    for ($i = 0; $i < C\count($header); ++$i) {
-      $cell = $header[$i];
-      $alignment = $alignments[$i];
-      if ($alignment !== null) {
-        $alignment = ' align="'.$alignment.'"';
-      }
-      $html .= '<th'.
-        ($alignment ?? '').
-        '>'.
-        _Private\FORCE_RENDER($this->renderNodes($cell)).
-        "</th>\n";
-    }
-    $html .= "</tr>\n</thead>";
-    return $html;
+    return
+      <thead>
+        {"\n"}
+        <tr>
+          {"\n"}
+          {Vec\map_with_key(
+            $node->getHeader(),
+            ($i, $cell) ==>
+              <frag>
+                <th_with_align
+                  align={$alignments[$i] |> $$ is null ? null : $$.''}>
+                  {$this->renderNodes($cell)}
+                </th_with_align>
+                {"\n"}
+              </frag>,
+          )}
+        </tr>
+        {"\n"}
+      </thead>;
   }
 
   protected function renderTableDataRow(
     Blocks\TableExtension $table,
     int $row_idx,
     Blocks\TableExtension::TRow $row,
-  ): string {
-    $html = '<tr>';
-    for ($i = 0; $i < C\count($row); ++$i) {
-      $cell = $row[$i];
-
-      $html .= "\n".
-        _Private\FORCE_RENDER(
-          $this->renderTableDataCell($table, $row_idx, $i, $cell),
-        );
-    }
-    $html .= "\n</tr>";
-    return $html;
+  ): XHP\Core\node {
+    return
+      <tr>
+        {Vec\map_with_key(
+          $row,
+          ($i, $cell) ==>
+            <frag>
+              {"\n"}
+              {$this->renderTableDataCell($table, -1, $i, $cell)}
+            </frag>,
+        )}
+        {"\n"}
+      </tr>;
   }
 
   protected function renderTableDataCell(
