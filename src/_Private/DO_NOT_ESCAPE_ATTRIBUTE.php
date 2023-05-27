@@ -13,7 +13,9 @@ namespace Facebook\Markdown\_Private;
 use namespace Facebook\XHP;
 
 // HHAST_IGNORE_ERROR[CamelCasedMethodsUnderscoredFunctions] intentionally SHOUT_CASE
-function DO_NOT_ESCAPE_ATTRIBUTE<T>(string $danger_danger_danger): T {
+function DO_NOT_ESCAPE_ATTRIBUTE<T super string>(
+  string $danger_danger_danger,
+): T {
   return \HH\FIXME\UNSAFE_CAST<DO_NOT_ESCAPE_ATTRIBUTE, T>(
     new DO_NOT_ESCAPE_ATTRIBUTE($danger_danger_danger),
     'XHP has this feature, where it allows you to set unsafe attributes. '.
