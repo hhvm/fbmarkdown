@@ -10,12 +10,11 @@
 
 namespace Facebook\Markdown;
 
-/**
- * @see RenderableAsXHP and use it if you can.
- */
-interface RenderableAsHTML {
-  public function renderAsHTML(
+use namespace Facebook\XHP;
+
+interface RenderableAsXHP {
+  public function renderAsXHP(
     RenderContext $context,
-    HTMLRenderer $renderer,
-  ): string;
+    HTMLXHPRenderer $renderer,
+  ): XHP\Core\node;
 }

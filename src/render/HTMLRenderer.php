@@ -66,9 +66,19 @@ class HTMLRenderer extends Renderer<string> {
 
   <<__Override>>
   protected function renderResolvedNode(ASTNode $node): string {
+    if ($node is RenderableAsXHP) {
+      $xhp_renderer = new HTMLXHPRenderer($this->getContext());
+      return $node->renderAsXHP($this->getContext(), $xhp_renderer)
+        |> _Private\FORCE_RENDER($$);
+    }
+
+    // This interface is implemented by users of this library.
+    // It must remain unchanged for backwards compatibility.
+    // Ideally users would switch over to RenderableAsXHP.
     if ($node is RenderableAsHTML) {
       return $node->renderAsHTML($this->getContext(), $this);
     }
+
     return parent::renderResolvedNode($node);
   }
 
