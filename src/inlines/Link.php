@@ -87,6 +87,7 @@ class Link extends Inline {
       if ($chr === ']') {
         --$depth;
         if ($depth === 0) {
+          // HHAST_FIXME[NoEmptyStatements] What was this supposed to do?
           $offset;
           break;
         }
