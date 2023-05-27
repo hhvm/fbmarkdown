@@ -178,7 +178,7 @@ class TableExtension extends LeafBlock implements BlockProducer {
       $definitely_row,
       Vec\map(
         $parts,
-        $part ==> Str\trim($part) |> Str\replace($$, "\\|", '|'),
+        $part ==> Str\trim($part) |> Str\replace($$, '\\|', '|'),
       ),
       $rest,
     );

@@ -32,7 +32,7 @@ final class SpecTest extends TestCase {
       }
       $start += Str\length(self::EXAMPLE_START);
       $newline = Str\search($text, "\n", $start);
-      invariant($newline !== null, "No newline after start marker");
+      invariant($newline !== null, 'No newline after start marker');
       $extension = Str\trim(Str\slice($text, $start, $newline - $start));
       $start = $newline;
       $end = Str\search($text, self::EXAMPLE_END, $start);
@@ -52,7 +52,7 @@ final class SpecTest extends TestCase {
       $count = C\count($parts);
       invariant(
         $count === 1 || $count === 2,
-        "examples should have input and output, example %d has %d parts",
+        'examples should have input and output, example %d has %d parts',
         C\count($examples) + 1,
         $count,
       );
@@ -65,7 +65,7 @@ final class SpecTest extends TestCase {
     }
     expect(C\count($examples))->toBeSame(
       self::EXAMPLE_COUNT,
-      "Did not get the expected number of examples",
+      'Did not get the expected number of examples',
     );
     return $examples;
   }

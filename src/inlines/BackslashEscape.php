@@ -21,7 +21,7 @@ class BackslashEscape extends InlineWithPlainTextContent {
     string $string,
     int $offset,
   ): ?(Inline, int) {
-    if ($string[$offset] !== "\\") {
+    if ($string[$offset] !== '\\') {
       return null;
     }
 

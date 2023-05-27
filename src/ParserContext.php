@@ -21,7 +21,7 @@ enum SourceType: int {
 
 final class ParserContext {
 
-  const keyset<string> DEFAULT_URI_SCHEME_ALLOW_LIST = keyset["http", "https", "irc", "mailto"];
+  const keyset<string> DEFAULT_URI_SCHEME_ALLOW_LIST = keyset['http', 'https', 'irc', 'mailto'];
   private BlockContext $blockContext;
   private InlineContext $inlineContext;
 

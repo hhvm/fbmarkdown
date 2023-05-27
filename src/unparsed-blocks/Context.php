@@ -56,7 +56,7 @@ class Context {
         self::ALL_BLOCK_TYPES,
         $class ==> Str\ends_with(
           Str\lowercase($class),
-          "\\".Str\lowercase($name).'extension',
+          '\\'.Str\lowercase($name).'extension',
         ),
       ),
     );
@@ -66,7 +66,7 @@ class Context {
   public function enableNamedExtension(string $name): this {
     $this->disabledBlockTypes = Keyset\filter(
       $this->disabledBlockTypes,
-      $class ==> !Str\ends_with(Str\lowercase($class), "\\".$name.'extension'),
+      $class ==> !Str\ends_with(Str\lowercase($class), '\\'.$name.'extension'),
     );
     return $this;
   }
@@ -156,7 +156,7 @@ class Context {
   public function popContext(string $context): this {
     $stack = $this->stacks[$context] ?? vec[];
     $count = C\count($stack) - 1;
-    invariant($count >= 0, "Trying to pop more than was pushed");
+    invariant($count >= 0, 'Trying to pop more than was pushed');
     $stack = Vec\take($stack, $count);
     $this->stacks[$context] = $stack;
     return $this;

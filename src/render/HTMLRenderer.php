@@ -250,7 +250,7 @@ class HTMLRenderer extends Renderer<string> {
     int $row_idx,
     Blocks\TableExtension::TRow $row,
   ): string {
-    $html = "<tr>";
+    $html = '<tr>';
     for ($i = 0; $i < C\count($row); ++$i) {
       $cell = $row[$i];
 
@@ -270,7 +270,7 @@ class HTMLRenderer extends Renderer<string> {
     if ($alignment !== null) {
       $alignment = ' align="'.$alignment.'"';
     }
-    return "<td".($alignment ?? '').'>'.$this->renderNodes($cell)."</td>";
+    return '<td'.($alignment ?? '').'>'.$this->renderNodes($cell).'</td>';
   }
 
   <<__Override>>
@@ -341,7 +341,7 @@ class HTMLRenderer extends Renderer<string> {
     $noFollowUgcTag =
       $this->getContext()->areLinksNoFollowUGC() ? ' rel="nofollow ugc"' : '';
     return
-      '<a href="'.$href.'"'.$noFollowUgcTag."".($title ?? '').'>'.$text.'</a>';
+      '<a href="'.$href.'"'.$noFollowUgcTag.''.($title ?? '').'>'.$text.'</a>';
   }
 
   <<__Override>>

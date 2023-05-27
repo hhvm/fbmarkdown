@@ -482,7 +482,7 @@ class Emphasis extends Inline {
     }
 
     $previous = $markdown[$offset - 1];
-    if ($previous !== "\\" && $previous !== $first) {
+    if ($previous !== '\\' && $previous !== $first) {
       return true;
     }
 

@@ -15,7 +15,7 @@ use function Facebook\FBExpect\expect;
 use namespace HH\Lib\{Str};
 
 final class NoFollowUgcAndImageTest extends TestCase {
-    const keyset<string> DEFAULT_URI_SCHEME_ALLOW_LIST = keyset["http", "https", "irc", "mailto"];
+    const keyset<string> DEFAULT_URI_SCHEME_ALLOW_LIST = keyset['http', 'https', 'irc', 'mailto'];
 
   protected function assertXSSExampleMatches(
     string $name,
@@ -65,21 +65,21 @@ final class NoFollowUgcAndImageTest extends TestCase {
     return vec[
       // LINKS
       tuple(
-        "[facebook](https://www.facebook.com)",
+        '[facebook](https://www.facebook.com)',
         "<p><a href=\"https://www.facebook.com\" rel=\"nofollow ugc\">facebook</a></p>\n",
       ),
       // AUTOLINKS
       tuple(
-        "<https://www.facebook.com>",
+        '<https://www.facebook.com>',
         "<p><a href=\"https://www.facebook.com\" rel=\"nofollow ugc\">https://www.facebook.com</a></p>\n",
       ),
 
       // LINK REFERENCE DEFINITIONS
       tuple(
-        "[foo]:
+        '[foo]:
 https://www.facebook.com
 
-[foo]",
+[foo]',
         "<p><a href=\"https://www.facebook.com\" rel=\"nofollow ugc\">foo</a></p>\n",
       ),
       // IMAGES

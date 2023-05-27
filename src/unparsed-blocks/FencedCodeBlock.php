@@ -58,7 +58,7 @@ class FencedCodeBlock extends FencedBlock {
       for ($i = 0; $i < $len; ++$i) {
         $char = $info[$i];
         if (
-          $char === "\\"
+          $char === '\\'
           && $i + 1 < $len
         ) {
           $next = $info[$i + 1];

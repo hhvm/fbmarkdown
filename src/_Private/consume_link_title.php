@@ -43,7 +43,7 @@ function consume_quoted_link_title(string $input): ?(string, int) {
       break;
     }
 
-    if ($chr === "\\") {
+    if ($chr === '\\') {
       if ($idx + 1 < $len) {
         $next = $input[$idx + 1];
         if (C\contains_key(ASCII_PUNCTUATION, $next)) {
@@ -99,7 +99,7 @@ function consume_parenthesized_link_title(string $input): ?(string, int) {
       continue;
     }
 
-    if ($chr === "\\") {
+    if ($chr === '\\') {
       if ($idx + 1 < $len) {
         $next = $input[$idx + 1];
         if (C\contains_key(ASCII_PUNCTUATION, $next)) {

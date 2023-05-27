@@ -60,7 +60,7 @@ class RenderContext {
   public function disableNamedExtension(string $extension): this {
     $this->enabledExtensions = Vec\filter(
       $this->enabledExtensions,
-      $obj ==> !Str\ends_with_ci(\get_class($obj), "\\".$extension.'Extension'),
+      $obj ==> !Str\ends_with_ci(\get_class($obj), '\\'.$extension.'Extension'),
     );
     return $this;
   }
@@ -68,7 +68,7 @@ class RenderContext {
   public function disableImageFiltering(): this {
     foreach ($this->extensions as $extension) {
       if ($extension is TagFilterExtension) {
-        $extension->removeFromTagBlacklist(keyset["<img"]);
+        $extension->removeFromTagBlacklist(keyset['<img']);
       }
     }
     return $this;
@@ -79,7 +79,7 @@ class RenderContext {
       |> Vec\filter(
         $$,
         $obj ==>
-          Str\ends_with_ci(\get_class($obj), "\\".$extension.'Extension'),
+          Str\ends_with_ci(\get_class($obj), '\\'.$extension.'Extension'),
       )
       |> Vec\concat($$, $this->enabledExtensions)
       |> Vec\unique_by($$, $x ==> \get_class($x));
