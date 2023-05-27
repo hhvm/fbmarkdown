@@ -12,7 +12,6 @@ namespace Facebook\Markdown;
 
 use namespace HH\Lib\{C, Str, Vec};
 
-// TODO: fix namespace support in XHP, use that :'(
 class HTMLRenderer extends Renderer<string> {
   const keyset<classname<RenderFilter>> EXTENSIONS = keyset[
     TagFilterExtension::class,
@@ -40,11 +39,7 @@ class HTMLRenderer extends Renderer<string> {
   protected static function escapeURIAttribute(string $text): string {
     // While the spec states that no particular method is required, we attempt
     // to match cmark's behavior so that we can run the spec test suite.
-    $text = \html_entity_decode(
-      $text,
-      \ENT_HTML5,
-      'UTF-8',
-    );
+    $text = \html_entity_decode($text, \ENT_HTML5, 'UTF-8');
 
     $out = '';
     $len = Str\length($text);
@@ -287,9 +282,8 @@ class HTMLRenderer extends Renderer<string> {
   protected function renderAutoLink(Inlines\AutoLink $node): string {
     $href = self::escapeURIAttribute($node->getDestination());
     $text = self::escapeContent($node->getText());
-    $noFollowUgcTag = $this->getContext()->areLinksNoFollowUGC()
-      ? ' rel="nofollow ugc"'
-      : '';
+    $noFollowUgcTag =
+      $this->getContext()->areLinksNoFollowUGC() ? ' rel="nofollow ugc"' : '';
     return '<a href="'.$href.'"'.$noFollowUgcTag.'>'.$text.'</a>';
   }
 
@@ -344,10 +338,10 @@ class HTMLRenderer extends Renderer<string> {
     $text = $node->getText()
       |> Vec\map($$, $child ==> $this->render($child))
       |> Str\join($$, '');
-    $noFollowUgcTag = $this->getContext()->areLinksNoFollowUGC()
-      ? ' rel="nofollow ugc"'
-      : '';
-    return '<a href="'.$href.'"'.$noFollowUgcTag."".($title ?? '').'>'.$text.'</a>';
+    $noFollowUgcTag =
+      $this->getContext()->areLinksNoFollowUGC() ? ' rel="nofollow ugc"' : '';
+    return
+      '<a href="'.$href.'"'.$noFollowUgcTag."".($title ?? '').'>'.$text.'</a>';
   }
 
   <<__Override>>
