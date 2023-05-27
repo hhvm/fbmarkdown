@@ -8,7 +8,11 @@
  *
  */
 
-namespace Facebook\Markdown\Blocks;
+namespace Facebook\Markdown\_Private;
 
-class Document extends ContainerBlock {
+use type IDisposable;
+
+<<__ReturnDisposable>>
+function disable_child_validation(): IDisposable {
+  return new ChildValidationDisablerDisposable();
 }

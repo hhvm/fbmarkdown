@@ -8,7 +8,13 @@
  *
  */
 
-namespace Facebook\Markdown\Blocks;
+namespace Facebook\Markdown;
 
-class Document extends ContainerBlock {
+use namespace Facebook\XHP;
+
+interface RenderableAsXHP {
+  public function renderAsXHP(
+    RenderContext $context,
+    HTMLXHPRenderer $renderer,
+  ): XHP\Core\node;
 }

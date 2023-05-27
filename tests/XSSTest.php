@@ -15,15 +15,15 @@ use function Facebook\FBExpect\expect;
 use namespace HH\Lib\{Str};
 
 final class XSSTest extends TestCase {
-  protected function assertXSSExampleMatches(
+  protected async function assertXSSExampleMatchesAsync(
     string $name,
     string $in,
     string $expected_html,
     ?string $extension,
-  ): void {
+  ): Awaitable<void> {
     $parser_ctx = (new ParserContext())
       ->enableHTML_UNSAFE()
-      ->setAllowedURISchemes(keyset["foo"])
+      ->setAllowedURISchemes(keyset['foo'])
       ->disableExtensions();
     $render_ctx = (new RenderContext())
       ->disableExtensions();
@@ -33,23 +33,32 @@ final class XSSTest extends TestCase {
     }
 
     $ast = parse($parser_ctx, $in);
-    $actual_html = (new HTMLRenderer($render_ctx))->render($ast);
+    foreach ($this->provideHTMLRendererConstructors() as list($constructor)) {
+      // HHAST_FIXME[DontAwaitInALoop] Suboptimial, but it's test code...
+      $actual_html = await static::unsafeStringifyXHPChildAsync(
+        $constructor($render_ctx)->render($ast),
+      );
 
-    // Improve output readability
-    $actual_html = Str\replace($actual_html, "\t", self::TAB_REPLACEMENT);
-    $expected_html = Str\replace($expected_html, "\t", self::TAB_REPLACEMENT);
+      // Improve output readability
+      $actual_html = Str\replace($actual_html, "\t", self::TAB_REPLACEMENT);
+      $normalized_expected_html =
+        Str\replace($expected_html, "\t", self::TAB_REPLACEMENT);
 
-    expect($actual_html)->toBeSame(
-      $expected_html,
-      "HTML differs for %s:\n%s",
-      $name,
-      $in,
-    );
+      expect($actual_html)->toBeSame(
+        $normalized_expected_html,
+        "HTML differs for %s:\n%s",
+        $name,
+        $in,
+      );
+    }
   }
 
   <<DataProvider('getXSSExamples')>>
-  public function testXSSExample(string $in, string $expected_html): void {
-    $this->assertXSSExampleMatches(
+  public async function testXSSExample(
+    string $in,
+    string $expected_html,
+  ): Awaitable<void> {
+    await $this->assertXSSExampleMatchesAsync(
       'unnamed',
       $in,
       $expected_html,
@@ -61,93 +70,87 @@ final class XSSTest extends TestCase {
     return vec[
       // LINKS
       tuple(
-        "[a](javascript:prompt(document.cookie))",
+        '[a](javascript:prompt(document.cookie))',
         "<p>[a](javascript:prompt(document.cookie))</p>\n",
       ),
       tuple(
-        "[notmalicious](javascript:window.onerror=alert;throw%20document.cookie)",
+        '[notmalicious](javascript:window.onerror=alert;throw%20document.cookie)',
         "<p>[notmalicious](javascript:window.onerror=alert;throw%20document.cookie)</p>\n",
       ),
       tuple(
-        "[a](j    a   v   a   s   c   r   i   p   t:prompt(document.cookie))",
+        '[a](j    a   v   a   s   c   r   i   p   t:prompt(document.cookie))',
         "<p>[a](j    a   v   a   s   c   r   i   p   t:prompt(document.cookie))</p>\n",
       ),
       tuple(
-        "[test](javascript://%0d%0aprompt(1))",
+        '[test](javascript://%0d%0aprompt(1))',
         "<p>[test](javascript://%0d%0aprompt(1))</p>\n",
       ),
       tuple(
-        "[test](javascript://%0d%0aprompt(1);com)",
+        '[test](javascript://%0d%0aprompt(1);com)',
         "<p>[test](javascript://%0d%0aprompt(1);com)</p>\n",
       ),
       tuple(
-        "[notmalicious](javascript:window.onerror=alert;throw%20document.cookie)",
+        '[notmalicious](javascript:window.onerror=alert;throw%20document.cookie)',
         "<p>[notmalicious](javascript:window.onerror=alert;throw%20document.cookie)</p>\n",
       ),
       tuple(
-        "[notmalicious](javascript://%0d%0awindow.onerror=alert;throw%20document.cookie)",
+        '[notmalicious](javascript://%0d%0awindow.onerror=alert;throw%20document.cookie)',
         "<p>[notmalicious](javascript://%0d%0awindow.onerror=alert;throw%20document.cookie)</p>\n",
       ),
       tuple(
-        "[a](data:text/html;base64,PHNjcmlwdD5hbGVydCgnWFNTJyk8L3NjcmlwdD4K)",
+        '[a](data:text/html;base64,PHNjcmlwdD5hbGVydCgnWFNTJyk8L3NjcmlwdD4K)',
         "<p>[a](data:text/html;base64,PHNjcmlwdD5hbGVydCgnWFNTJyk8L3NjcmlwdD4K)</p>\n",
       ),
       tuple(
-        "[clickme](vbscript:alert(document.domain))",
+        '[clickme](vbscript:alert(document.domain))',
         "<p>[clickme](vbscript:alert(document.domain))</p>\n",
       ),
       tuple(
-        "[a](javascript:this;alert(1))",
+        '[a](javascript:this;alert(1))',
         "<p>[a](javascript:this;alert(1))</p>\n",
       ),
       tuple(
-        "[a](javascript://www.google.com%0Aprompt(1))",
+        '[a](javascript://www.google.com%0Aprompt(1))',
         "<p>[a](javascript://www.google.com%0Aprompt(1))</p>\n",
       ),
       tuple(
-        "[a](javascript://%0d%0aconfirm(1);com)",
+        '[a](javascript://%0d%0aconfirm(1);com)',
         "<p>[a](javascript://%0d%0aconfirm(1);com)</p>\n",
       ),
       tuple(
-        "[a](javascript:window.onerror=confirm;throw%201)",
+        '[a](javascript:window.onerror=confirm;throw%201)',
         "<p>[a](javascript:window.onerror=confirm;throw%201)</p>\n",
       ),
       tuple(
-        "[a](javascript://www.google.com%0Aalert(1))",
+        '[a](javascript://www.google.com%0Aalert(1))',
         "<p>[a](javascript://www.google.com%0Aalert(1))</p>\n",
       ),
       tuple(
         "[a]('javascript:alert(\"1\")')",
         "<p>[a]('javascript:alert(&quot;1&quot;)')</p>\n",
       ),
-      tuple("[a](JaVaScRiPt:alert(1))", "<p>[a](JaVaScRiPt:alert(1))</p>\n"),
+      tuple('[a](JaVaScRiPt:alert(1))', "<p>[a](JaVaScRiPt:alert(1))</p>\n"),
       // AUTOLINKS
       tuple(
-        "</http://<?php\><\h1\><script:script>confirm(2)",
+        '</http://<?php\><\h1\><script:script>confirm(2)',
         "<p>&lt;/http://&lt;?php&gt;&lt;\h1&gt;&lt;script:script&gt;confirm(2)</p>\n",
       ),
       tuple(
-        "<javascript:prompt(document.cookie)>",
+        '<javascript:prompt(document.cookie)>',
         "<p>&lt;javascript:prompt(document.cookie)&gt;</p>\n",
       ),
-      tuple("<me@example.com>", "<p>&lt;me@example.com&gt;</p>\n"),
+      tuple('<me@example.com>', "<p>&lt;me@example.com&gt;</p>\n"),
       // LINK REFERENCE DEFINITIONS
       tuple(
-        "[foo]:
+        '[foo]:
 javascript:prompt(document.cookie)
 
-[foo]",
+[foo]',
         "<p>[foo]:\njavascript:prompt(document.cookie)</p>\n<p>[foo]</p>\n",
       ),
       // An accepted URI works, but a bad URI that's a longer version of the target URI shouldn't work
-      tuple(
-        "<foo:blah>",
-        "<p><a href=\"foo:blah\">foo:blah</a></p>\n",
-      ),
-      tuple(
-        "<foobar:blah>",
-        "<p>&lt;foobar:blah&gt;</p>\n",
-      )
+      tuple('<foo:blah>', "<p><a href=\"foo:blah\">foo:blah</a></p>\n"),
+      tuple('<foobar:blah>', "<p>&lt;foobar:blah&gt;</p>\n"),
     ];
   }
 }

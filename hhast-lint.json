@@ -1,3 +1,11 @@
 {
-  "roots": [ "src/", "tests/" ]
+  "roots": [
+    "src/",
+    "tests/"
+  ],
+  "builtinLinters": "all",
+  "disabledLinters": [
+    "Facebook\\HHAST\\FinalOrAbstractClassLinter",
+    "Facebook\\HHAST\\UseStatementWithAsLinter"
+  ]
 }

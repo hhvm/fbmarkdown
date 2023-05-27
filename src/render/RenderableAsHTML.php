@@ -10,6 +10,9 @@
 
 namespace Facebook\Markdown;
 
+/**
+ * @see RenderableAsXHP and use it if you can.
+ */
 interface RenderableAsHTML {
   public function renderAsHTML(
     RenderContext $context,

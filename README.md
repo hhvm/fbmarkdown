@@ -20,11 +20,6 @@ Originally, the Ruby GFM pipeline was the best fit; over time, we started to wan
 
 FBMarkdown exists to address all of these goals.
 
-## Requirements
-
-- HHVM 3.24 or above.
-- [hhvm-autoload](https://github.com/hhvm/hhvm-autoload)
-
 ## Installing FBMarkdown
 
     hhvm composer.phar require facebook/fbmarkdown
@@ -90,7 +85,8 @@ Extend `Facebook\Markdown\Inlines\Inline` or a subclass, and pass your classname
 
 There are then several approaches to rendering:
  - instantiate your subclass, and add support for it to a custom renderer
- - instantiate your subclass, and make it implement the `Facebook\Markdown\RenderableAsHTML` interface
+ - instantiate your subclass, and make it implement the `Facebook\Markdown\RenderableAsXHP` interface
+   - Failing that, try the `Facebook\Markdown\RenderableAsHTML` interface.
  - if it could be replaced with several existing inlines, return a
    `Facebook\Markdown\Inlines\InlineSequence`, then you won't need to extend the renderer.
 
@@ -101,7 +97,8 @@ to `$render_ctx->getBlockContext()->prependBlockTypes(...)`.
 
 There are then several approaches to rendering:
  - create a subclass of `Block`, and add support for it to a custom renderer
- - create a subclass of `Block`, and make it implement the `Facebook\Markdown\RenderableAsHTML` interface
+ - create a subclass of `Block`, and make it implement the `Facebook\Markdown\RenderableAsXHP` interface
+   - Failing that, try the `Facebook\Markdown\RenderableAsHTML` interface.
  - if it could be replaced with several existing blocks, return a
    `Facebook\Markdown\Blocks\BlockSequence`
  - if it could be replaced with a paragraph of inlines, return a `Facebook\Markdown\Blocks\InlineSequenceBlock`

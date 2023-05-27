@@ -17,13 +17,13 @@ use namespace HH\Lib\Vec;
 final class BlockSequence extends LeafBlock {
   private vec<Block> $children;
 
-  final public function __construct(
+  public function __construct(
     vec<?Block> $children,
   ) {
     $this->children = Vec\filter_nulls($children);
   }
 
-  final public static function flatten(?Block ...$children): this {
+  public static function flatten(?Block ...$children): this {
     return new self(vec($children));
   }
 

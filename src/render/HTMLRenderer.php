@@ -11,8 +11,18 @@
 namespace Facebook\Markdown;
 
 use namespace HH\Lib\{C, Str, Vec};
+use namespace HH\Asio;
 
-// TODO: fix namespace support in XHP, use that :'(
+/**
+ * You probably want to use `HTMLXHPRenderer` or failing that
+ * `HTMLWithXHPInternallyRenderer`. These two renderers are built with xhp,
+ * which automates the escaping of attributes and text nodes.
+ *
+ * `HTMLRenderer` uses string concatenation and manual escaping under the hood.
+ * Great care is taken to escape user data, but when this is done manually,
+ * bugs can slip through. Strongly consider the other renderers in security
+ * critical contexts.
+ */
 class HTMLRenderer extends Renderer<string> {
   const keyset<classname<RenderFilter>> EXTENSIONS = keyset[
     TagFilterExtension::class,
@@ -27,6 +37,7 @@ class HTMLRenderer extends Renderer<string> {
   }
 
   // This is the list from the reference implementation
+  // Unused, but kept for backwards compatibility.
   //hackfmt-ignore
   const keyset<string> URI_SAFE = keyset[
     '-', '_', '.', '+', '!', '*', "'", '(', ')', ';', ':', '%', '#', '@', '?',
@@ -38,42 +49,33 @@ class HTMLRenderer extends Renderer<string> {
   ];
 
   protected static function escapeURIAttribute(string $text): string {
-    // While the spec states that no particular method is required, we attempt
-    // to match cmark's behavior so that we can run the spec test suite.
-    $text = \html_entity_decode(
-      $text,
-      /* HH_FIXME[4106] */ /* HH_FIXME[2049] */ \ENT_HTML5,
-      'UTF-8',
-    );
-
-    $out = '';
-    $len = Str\length($text);
-    for ($i = 0; $i < $len; ++$i) {
-      $char = $text[$i];
-      if (C\contains_key(self::URI_SAFE, $char)) {
-        $out .= $char;
-        continue;
-      }
-      $out .= \urlencode($char);
-    }
-    $text = $out;
-
-    return self::escapeAttribute($text);
+    return _Private\escape_uri_attribute($text)->toHTMLString();
   }
 
   <<__Override>>
   protected function renderNodes(vec<ASTNode> $nodes): string {
     return $nodes
       |> Vec\map($$, $node ==> $this->render($node))
-      |> Vec\filter($$, $line ==> $line !== '')
       |> Str\join($$, '');
   }
 
   <<__Override>>
   protected function renderResolvedNode(ASTNode $node): string {
+    if ($node is RenderableAsXHP) {
+      $xhp_renderer = new HTMLXHPRenderer($this->getContext());
+      // HHAST_IGNORE_ERROR[DontUseAsioJoin]
+      return Asio\join(
+        $node->renderAsXHP($this->getContext(), $xhp_renderer)->toStringAsync(),
+      );
+    }
+
+    // This interface is implemented by users of this library.
+    // It must remain unchanged for backwards compatibility.
+    // Ideally users would switch over to RenderableAsXHP.
     if ($node is RenderableAsHTML) {
       return $node->renderAsHTML($this->getContext(), $this);
     }
+
     return parent::renderResolvedNode($node);
   }
 
@@ -255,7 +257,7 @@ class HTMLRenderer extends Renderer<string> {
     int $row_idx,
     Blocks\TableExtension::TRow $row,
   ): string {
-    $html = "<tr>";
+    $html = '<tr>';
     for ($i = 0; $i < C\count($row); ++$i) {
       $cell = $row[$i];
 
@@ -275,7 +277,7 @@ class HTMLRenderer extends Renderer<string> {
     if ($alignment !== null) {
       $alignment = ' align="'.$alignment.'"';
     }
-    return "<td".($alignment ?? '').'>'.$this->renderNodes($cell)."</td>";
+    return '<td'.($alignment ?? '').'>'.$this->renderNodes($cell).'</td>';
   }
 
   <<__Override>>
@@ -287,9 +289,8 @@ class HTMLRenderer extends Renderer<string> {
   protected function renderAutoLink(Inlines\AutoLink $node): string {
     $href = self::escapeURIAttribute($node->getDestination());
     $text = self::escapeContent($node->getText());
-    $noFollowUgcTag = $this->getContext()->areLinksNoFollowUGC()
-      ? ' rel="nofollow ugc"'
-      : '';
+    $noFollowUgcTag =
+      $this->getContext()->areLinksNoFollowUGC() ? ' rel="nofollow ugc"' : '';
     return '<a href="'.$href.'"'.$noFollowUgcTag.'>'.$text.'</a>';
   }
 
@@ -344,10 +345,10 @@ class HTMLRenderer extends Renderer<string> {
     $text = $node->getText()
       |> Vec\map($$, $child ==> $this->render($child))
       |> Str\join($$, '');
-    $noFollowUgcTag = $this->getContext()->areLinksNoFollowUGC()
-      ? ' rel="nofollow ugc"'
-      : '';
-    return '<a href="'.$href.'"'.$noFollowUgcTag."".($title ?? '').'>'.$text.'</a>';
+    $noFollowUgcTag =
+      $this->getContext()->areLinksNoFollowUGC() ? ' rel="nofollow ugc"' : '';
+    return
+      '<a href="'.$href.'"'.$noFollowUgcTag.''.($title ?? '').'>'.$text.'</a>';
   }
 
   <<__Override>>

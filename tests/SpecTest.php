@@ -32,7 +32,7 @@ final class SpecTest extends TestCase {
       }
       $start += Str\length(self::EXAMPLE_START);
       $newline = Str\search($text, "\n", $start);
-      invariant($newline !== null, "No newline after start marker");
+      invariant($newline !== null, 'No newline after start marker');
       $extension = Str\trim(Str\slice($text, $start, $newline - $start));
       $start = $newline;
       $end = Str\search($text, self::EXAMPLE_END, $start);
@@ -52,7 +52,7 @@ final class SpecTest extends TestCase {
       $count = C\count($parts);
       invariant(
         $count === 1 || $count === 2,
-        "examples should have input and output, example %d has %d parts",
+        'examples should have input and output, example %d has %d parts',
         C\count($examples) + 1,
         $count,
       );
@@ -65,19 +65,24 @@ final class SpecTest extends TestCase {
     }
     expect(C\count($examples))->toBeSame(
       self::EXAMPLE_COUNT,
-      "Did not get the expected number of examples",
+      'Did not get the expected number of examples',
     );
     return $examples;
   }
 
   <<DataProvider('getSpecExamples')>>
-  public function testSpecExample(
+  public async function testSpecExample(
     string $name,
     string $in,
     string $expected_html,
     ?string $extension,
-  ): void {
-    $this->assertExampleMatches($name, $in, $expected_html, $extension);
+  ): Awaitable<void> {
+    await $this->assertExampleMatchesAsync(
+      $name,
+      $in,
+      $expected_html,
+      $extension,
+    );
   }
   <<DataProvider('getSpecExamples')>>
   /** Parse markdown to an AST, re-serialize it to markdown, then re-parse and
@@ -86,12 +91,12 @@ final class SpecTest extends TestCase {
    * This is basically a test of `MarkdownRenderer`.
    *
    */
-  public function testSpecExampleNormalizesWithoutHTMLChange(
+  public async function testSpecExampleNormalizesWithoutHTMLChange(
     string $name,
     string $original_md,
     string $expected_html,
     ?string $extension,
-  ): void {
+  ): Awaitable<void> {
     $parser_ctx = (new ParserContext())
       ->setSourceType(SourceType::TRUSTED)
       ->disableExtensions();
@@ -105,17 +110,24 @@ final class SpecTest extends TestCase {
     $ast = parse($parser_ctx, $original_md);
     $normalized_md = (new MarkdownRenderer($render_ctx))->render($ast);
     $normalized_ast = parse($parser_ctx, $normalized_md);
-    $actual_html = (new HTMLRenderer($render_ctx))->render($normalized_ast);
+    foreach ($this->provideHTMLRendererConstructors() as list($constructor)) {
+      using (_Private\disable_child_validation()) {
+        // HHAST_FIXME[DontAwaitInALoop] Suboptimial, but it's test code...
+        $actual_html = await static::unsafeStringifyXHPChildAsync(
+          $constructor($render_ctx)->render($normalized_ast),
+        );
+      }
 
-    $actual_html = self::normalizeHTML($actual_html);
-    $expected_html = self::normalizeHTML($expected_html);
+      $actual_html = self::normalizeHTML($actual_html);
+      $normalized_expected_html = self::normalizeHTML($expected_html);
 
-    expect($actual_html)->toBeSame(
-      $expected_html,
-      "HTML differs for %s:\n%s",
-      $name,
-      $original_md,
-    );
+      expect($actual_html)->toBeSame(
+        $normalized_expected_html,
+        "HTML differs for %s:\n%s",
+        $name,
+        $original_md,
+      );
+    }
   }
 
   private static function normalizeHTML(string $html): string {

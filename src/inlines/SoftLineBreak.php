@@ -10,7 +10,6 @@
 
 namespace Facebook\Markdown\Inlines;
 
-
 class SoftLineBreak extends Inline {
   public function __construct() {
   }

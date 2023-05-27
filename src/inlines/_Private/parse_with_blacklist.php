@@ -41,7 +41,7 @@ function parse_with_denylist (
     list($inline, $new_offset) = $result;
     invariant(
       $new_offset > $offset,
-      "Failed to consume any data with %s",
+      'Failed to consume any data with %s',
       \get_class($inline),
     );
     $offset = $new_offset;

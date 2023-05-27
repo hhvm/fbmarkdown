@@ -15,14 +15,15 @@ use function Facebook\FBExpect\expect;
 use namespace HH\Lib\{Str};
 
 final class NoFollowUgcAndImageTest extends TestCase {
-    const keyset<string> DEFAULT_URI_SCHEME_ALLOW_LIST = keyset["http", "https", "irc", "mailto"];
+  const keyset<string> DEFAULT_URI_SCHEME_ALLOW_LIST =
+    keyset['http', 'https', 'irc', 'mailto'];
 
-  protected function assertXSSExampleMatches(
+  protected async function assertXSSExampleMatchesAsync(
     string $name,
     string $in,
     string $expected_html,
     ?string $extension,
-  ): void {
+  ): Awaitable<void> {
     $parser_ctx = (new ParserContext())
       ->setSourceType(SourceType::USER_GENERATED_CONTENT)
       ->setAllowedURISchemes(self::DEFAULT_URI_SCHEME_ALLOW_LIST)
@@ -37,23 +38,31 @@ final class NoFollowUgcAndImageTest extends TestCase {
     }
 
     $ast = parse($parser_ctx, $in);
-    $actual_html = (new HTMLRenderer($render_ctx))->render($ast);
+    foreach ($this->provideHTMLRendererConstructors() as list($constructor)) {
+      // HHAST_FIXME[DontAwaitInALoop] Suboptimial, but it's test code...
+      $actual_html = await static::unsafeStringifyXHPChildAsync(
+        $constructor($render_ctx)->render($ast),
+      );
 
-    // Improve output readability
-    $actual_html = Str\replace($actual_html, "\t", self::TAB_REPLACEMENT);
-    $expected_html = Str\replace($expected_html, "\t", self::TAB_REPLACEMENT);
+      // Improve output readability
+      $actual_html = Str\replace($actual_html, "\t", self::TAB_REPLACEMENT);
+      $normalized_expected_html = Str\replace($expected_html, "\t", self::TAB_REPLACEMENT);
 
-    expect($actual_html)->toBeSame(
-      $expected_html,
-      "HTML differs for %s:\n%s",
-      $name,
-      $in,
-    );
+      expect($actual_html)->toBeSame(
+        $normalized_expected_html,
+        "HTML differs for %s:\n%s",
+        $name,
+        $in,
+      );
+    }
   }
 
   <<DataProvider('getNoFollowUgcAndImageExamples')>>
-  public function testXSSExample(string $in, string $expected_html): void {
-    $this->assertXSSExampleMatches(
+  public async function testXSSExample(
+    string $in,
+    string $expected_html,
+  ): Awaitable<void> {
+    await $this->assertXSSExampleMatchesAsync(
       'unnamed',
       $in,
       $expected_html,
@@ -65,21 +74,21 @@ final class NoFollowUgcAndImageTest extends TestCase {
     return vec[
       // LINKS
       tuple(
-        "[facebook](https://www.facebook.com)",
+        '[facebook](https://www.facebook.com)',
         "<p><a href=\"https://www.facebook.com\" rel=\"nofollow ugc\">facebook</a></p>\n",
       ),
       // AUTOLINKS
       tuple(
-        "<https://www.facebook.com>",
+        '<https://www.facebook.com>',
         "<p><a href=\"https://www.facebook.com\" rel=\"nofollow ugc\">https://www.facebook.com</a></p>\n",
       ),
 
       // LINK REFERENCE DEFINITIONS
       tuple(
-        "[foo]:
+        '[foo]:
 https://www.facebook.com
 
-[foo]",
+[foo]',
         "<p><a href=\"https://www.facebook.com\" rel=\"nofollow ugc\">foo</a></p>\n",
       ),
       // IMAGES

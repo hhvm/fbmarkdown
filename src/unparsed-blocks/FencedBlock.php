@@ -10,7 +10,6 @@
 
 namespace Facebook\Markdown\UnparsedBlocks;
 
-
 abstract class FencedBlock extends LeafBlock implements BlockProducer {
   protected abstract static function createFromLines(
     vec<string> $lines,

@@ -17,7 +17,7 @@ function get_html_entity_table(): dict<string, string> {
   $file = __DIR__.'/../../third-party/entities.json';
   invariant(
     \file_exists($file),
-    "Expected %s to exist",
+    'Expected %s to exist',
     $file,
   );
   $data = \json_decode(

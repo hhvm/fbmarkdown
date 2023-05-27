@@ -12,7 +12,7 @@ namespace Facebook\Markdown;
 
 use namespace HH\Lib\C;
 
-abstract class Renderer<T> {
+abstract class Renderer<T> implements IRenderer<T> {
   public function __construct(
     private RenderContext $context,
   ) {
@@ -173,7 +173,7 @@ abstract class Renderer<T> {
     }
 
     invariant_violation(
-      "Unhandled node type: %s",
+      'Unhandled node type: %s',
       \get_class($node),
     );
   }

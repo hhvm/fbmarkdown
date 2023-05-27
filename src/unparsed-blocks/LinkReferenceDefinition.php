@@ -45,7 +45,7 @@ class LinkReferenceDefinition extends LeafBlock implements BlockProducer {
   public static function normalizeKey(string $in): string {
     return $in
       |> Str\trim($$)
-      |> \mb_convert_case($$, \MB_CASE_LOWER, "UTF-8")
+      |> \mb_convert_case($$, \MB_CASE_LOWER, 'UTF-8')
       |> \preg_replace('/\s+/', ' ', $$);
   }
 
@@ -183,9 +183,9 @@ class LinkReferenceDefinition extends LeafBlock implements BlockProducer {
         if ($char === ']') {
           break;
         }
-        if ($char === "\\") {
+        if ($char === '\\') {
           if ($i + 1 < $len) {
-            $label .= "\\".$line[$i + 1];
+            $label .= '\\'.$line[$i + 1];
             ++$i;
             continue;
           }

@@ -99,7 +99,7 @@ class Context {
       $this->disabledInlineTypes,
       Keyset\filter(
         self::ALL_INLINE_TYPES,
-        $class ==> Str\ends_with(Str\lowercase($class), "\\".$name.'extension'),
+        $class ==> Str\ends_with(Str\lowercase($class), '\\'.$name.'extension'),
       ),
     );
     return $this;
@@ -110,7 +110,7 @@ class Context {
       $this->disabledInlineTypes,
       $class ==> !Str\ends_with(
         Str\lowercase($class),
-        "\\".Str\lowercase($name).'extension',
+        '\\'.Str\lowercase($name).'extension',
       ),
     );
     return $this;

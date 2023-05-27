@@ -40,7 +40,7 @@ function decode_html_entity(string $string): ?(string, string, string) {
 
   $out = \html_entity_decode(
     $match,
-    /* HH_FIXME[4106] */ /* HH_FIXME[2049] */ \ENT_HTML5,
+    \ENT_HTML5,
     'UTF-8',
   );
   if ($out === $match) {

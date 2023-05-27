@@ -223,10 +223,10 @@ class MarkdownRenderer extends Renderer<string> {
         $line ==> {
           $parsed = UnparsedBlocks\parse($ctx, $line)->getChildren();
           if (!C\firstx($parsed) is UnparsedBlocks\Paragraph) {
-            return "    ".$line;
+            return '    '.$line;
           }
           if (\preg_match('/^ {0,3}[=-]+ *$/', $line)) {
-            return "\\".$line;
+            return '\\'.$line;
           }
           return $line;
         },
@@ -286,7 +286,7 @@ class MarkdownRenderer extends Renderer<string> {
     Blocks\TableExtension::TCell $cell,
   ): string {
     return $this->renderNodes($cell)
-      |> Str\replace($$, "|", "\\|");
+      |> Str\replace($$, '|', '\\|');
   }
 
   <<__Override>>
@@ -307,7 +307,7 @@ class MarkdownRenderer extends Renderer<string> {
     Inlines\InlineWithPlainTextContent $node,
   ): string {
     if ($node is Inlines\BackslashEscape) {
-      return "\\".$node->getContent();
+      return '\\'.$node->getContent();
     }
     if ($node is Inlines\EntityReference) {
       // This matters if the entity reference is for whitespace: if we print
@@ -369,7 +369,7 @@ class MarkdownRenderer extends Renderer<string> {
   protected function renderImage(Inlines\Image $node): string {
     $t = $node->getTitle();
     return Str\format(
-      "![%s](<%s>%s)",
+      '![%s](<%s>%s)',
       $this->renderNodes($node->getDescription()),
       $node->getSource(),
       $t === null ? '' : (' "'.$t.'"'),
