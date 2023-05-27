@@ -56,7 +56,6 @@ class HTMLRenderer extends Renderer<string> {
   protected function renderNodes(vec<ASTNode> $nodes): string {
     return $nodes
       |> Vec\map($$, $node ==> $this->render($node))
-      |> Vec\filter($$, $line ==> $line !== '')
       |> Str\join($$, '');
   }
 

@@ -50,7 +50,6 @@ class HTMLXHPRenderer extends Renderer<XHP\Core\node> {
   protected function renderNodes(vec<ASTNode> $nodes): XHP\Core\node {
     return $nodes
       |> Vec\map($$, $node ==> $this->render($node))
-      |> Vec\filter($$, $line ==> $line !== '')
       |> _Private\xhp_join($$);
   }
 
