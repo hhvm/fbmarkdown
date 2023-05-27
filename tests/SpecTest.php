@@ -71,13 +71,18 @@ final class SpecTest extends TestCase {
   }
 
   <<DataProvider('getSpecExamples')>>
-  public function testSpecExample(
+  public async function testSpecExample(
     string $name,
     string $in,
     string $expected_html,
     ?string $extension,
-  ): void {
-    $this->assertExampleMatches($name, $in, $expected_html, $extension);
+  ): Awaitable<void> {
+    await $this->assertExampleMatchesAsync(
+      $name,
+      $in,
+      $expected_html,
+      $extension,
+    );
   }
   <<DataProvider('getSpecExamples')>>
   /** Parse markdown to an AST, re-serialize it to markdown, then re-parse and
@@ -86,12 +91,12 @@ final class SpecTest extends TestCase {
    * This is basically a test of `MarkdownRenderer`.
    *
    */
-  public function testSpecExampleNormalizesWithoutHTMLChange(
+  public async function testSpecExampleNormalizesWithoutHTMLChange(
     string $name,
     string $original_md,
     string $expected_html,
     ?string $extension,
-  ): void {
+  ): Awaitable<void> {
     $parser_ctx = (new ParserContext())
       ->setSourceType(SourceType::TRUSTED)
       ->disableExtensions();
@@ -105,17 +110,21 @@ final class SpecTest extends TestCase {
     $ast = parse($parser_ctx, $original_md);
     $normalized_md = (new MarkdownRenderer($render_ctx))->render($ast);
     $normalized_ast = parse($parser_ctx, $normalized_md);
-    $actual_html = (new HTMLRenderer($render_ctx))->render($normalized_ast);
+    foreach ($this->provideHTMLRendererConstructors() as list($constructor)) {
+      $actual_html = await static::unsafeStringifyXHPChildAsync(
+        $constructor($render_ctx)->render($normalized_ast),
+      );
 
-    $actual_html = self::normalizeHTML($actual_html);
-    $expected_html = self::normalizeHTML($expected_html);
+      $actual_html = self::normalizeHTML($actual_html);
+      $expected_html = self::normalizeHTML($expected_html);
 
-    expect($actual_html)->toBeSame(
-      $expected_html,
-      "HTML differs for %s:\n%s",
-      $name,
-      $original_md,
-    );
+      expect($actual_html)->toBeSame(
+        $expected_html,
+        "HTML differs for %s:\n%s",
+        $name,
+        $original_md,
+      );
+    }
   }
 
   private static function normalizeHTML(string $html): string {

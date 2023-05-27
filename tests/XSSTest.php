@@ -15,12 +15,12 @@ use function Facebook\FBExpect\expect;
 use namespace HH\Lib\{Str};
 
 final class XSSTest extends TestCase {
-  protected function assertXSSExampleMatches(
+  protected async function assertXSSExampleMatchesAsync(
     string $name,
     string $in,
     string $expected_html,
     ?string $extension,
-  ): void {
+  ): Awaitable<void> {
     $parser_ctx = (new ParserContext())
       ->enableHTML_UNSAFE()
       ->setAllowedURISchemes(keyset['foo'])
@@ -33,23 +33,30 @@ final class XSSTest extends TestCase {
     }
 
     $ast = parse($parser_ctx, $in);
-    $actual_html = (new HTMLRenderer($render_ctx))->render($ast);
+    foreach ($this->provideHTMLRendererConstructors() as list($constructor)) {
+      $actual_html = await static::unsafeStringifyXHPChildAsync(
+        $constructor($render_ctx)->render($ast),
+      );
 
-    // Improve output readability
-    $actual_html = Str\replace($actual_html, "\t", self::TAB_REPLACEMENT);
-    $expected_html = Str\replace($expected_html, "\t", self::TAB_REPLACEMENT);
+      // Improve output readability
+      $actual_html = Str\replace($actual_html, "\t", self::TAB_REPLACEMENT);
+      $expected_html = Str\replace($expected_html, "\t", self::TAB_REPLACEMENT);
 
-    expect($actual_html)->toBeSame(
-      $expected_html,
-      "HTML differs for %s:\n%s",
-      $name,
-      $in,
-    );
+      expect($actual_html)->toBeSame(
+        $expected_html,
+        "HTML differs for %s:\n%s",
+        $name,
+        $in,
+      );
+    }
   }
 
   <<DataProvider('getXSSExamples')>>
-  public function testXSSExample(string $in, string $expected_html): void {
-    $this->assertXSSExampleMatches(
+  public async function testXSSExample(
+    string $in,
+    string $expected_html,
+  ): Awaitable<void> {
+    await $this->assertXSSExampleMatchesAsync(
       'unnamed',
       $in,
       $expected_html,
@@ -140,14 +147,8 @@ javascript:prompt(document.cookie)
         "<p>[foo]:\njavascript:prompt(document.cookie)</p>\n<p>[foo]</p>\n",
       ),
       // An accepted URI works, but a bad URI that's a longer version of the target URI shouldn't work
-      tuple(
-        '<foo:blah>',
-        "<p><a href=\"foo:blah\">foo:blah</a></p>\n",
-      ),
-      tuple(
-        '<foobar:blah>',
-        "<p>&lt;foobar:blah&gt;</p>\n",
-      )
+      tuple('<foo:blah>', "<p><a href=\"foo:blah\">foo:blah</a></p>\n"),
+      tuple('<foobar:blah>', "<p>&lt;foobar:blah&gt;</p>\n"),
     ];
   }
 }

@@ -12,6 +12,7 @@ namespace Facebook\Markdown;
 
 use type Facebook\HackTest\DataProvider;
 use function Facebook\FBExpect\expect;
+use type XHPChild;
 
 final class EdgeCaseTest extends TestCase {
   public function getManualExamples(): vec<(string, string)> {
@@ -58,8 +59,11 @@ final class EdgeCaseTest extends TestCase {
   }
 
   <<DataProvider('getManualExamples')>>
-  public function testManualExample(string $in, string $expected_html): void {
-    $this->assertExampleMatches(
+  public async function testManualExample(
+    string $in,
+    string $expected_html,
+  ): Awaitable<void> {
+    await $this->assertExampleMatchesAsync(
       'unnamed',
       $in,
       $expected_html,
@@ -67,18 +71,22 @@ final class EdgeCaseTest extends TestCase {
     );
   }
 
-  public function testTagFilter(): void {
+  <<DataProvider('provideHTMLRendererConstructors')>>
+  public async function testTagFilter(
+    (function(RenderContext): IRenderer<XHPChild>) $constructor,
+  ): Awaitable<void> {
     $ast = parse(
       (new ParserContext())->setSourceType(SourceType::TRUSTED),
       '<iframe />',
     );
-    $html = (new HTMLRenderer(new RenderContext()))->render($ast);
+    $html = await static::unsafeStringifyXHPChildAsync(
+      $constructor(new RenderContext())->render($ast),
+    );
     expect($html)->toBeSame("&lt;iframe />\n");
-    $html = (
-      new HTMLRenderer(
-        (new RenderContext())->disableNamedExtension('TagFilter'),
-      )
-    )->render($ast);
+    $html = await static::unsafeStringifyXHPChildAsync(
+      $constructor((new RenderContext())->disableNamedExtension('TagFilter'))
+        ->render($ast),
+    );
     expect($html)->toBeSame("<iframe />\n");
   }
 }
