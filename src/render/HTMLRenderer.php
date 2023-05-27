@@ -42,7 +42,7 @@ class HTMLRenderer extends Renderer<string> {
     // to match cmark's behavior so that we can run the spec test suite.
     $text = \html_entity_decode(
       $text,
-      /* HH_FIXME[4106] */ /* HH_FIXME[2049] */ \ENT_HTML5,
+      \ENT_HTML5,
       'UTF-8',
     );
 
