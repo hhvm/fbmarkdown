@@ -14,6 +14,7 @@ use namespace HH\Lib\{C, Str, Vec};
 use namespace Facebook\XHP;
 use type Facebook\XHP\Core\frag;
 use type Facebook\XHP\HTML\{
+  a,
   blockquote,
   br,
   code,
@@ -28,6 +29,7 @@ use type Facebook\XHP\HTML\{
   hr,
   img,
   p,
+  pre,
   strong,
 };
 use type Facebook\Markdown\_Private\td_with_align;
@@ -116,18 +118,11 @@ class HTMLXHPRenderer extends Renderer<XHP\Core\node> {
 
   <<__Override>>
   protected function renderCodeBlock(Blocks\CodeBlock $node): XHP\Core\node {
-    $extra = '';
-    $info = $node->getInfoString();
-    if ($info !== null) {
-      $first = C\firstx(Str\split($info, ' '));
-      $extra = ' class="language-'.self::escapeAttribute($first).'"';
-    }
-    $code = $node->getCode();
-    if ($code !== '') {
-      $code = self::escapeContent($code)."\n";
-    }
-    return '<pre><code'.$extra.'>'.$code."</code></pre>\n"
-      |> _Private\DO_NOT_ESCAPE($$);
+    $lang = $node->getInfoString()
+      |> $$ is null ? $$ : 'language-'.C\firstx(Str\split($$, ' '));
+    $code = $node->getCode() |> $$ === '' ? $$ : $$."\n";
+
+    return <frag><pre><code class={$lang}>{$code}</code></pre>{"\n"}</frag>;
   }
 
   <<__Override>>
@@ -151,7 +146,7 @@ class HTMLXHPRenderer extends Renderer<XHP\Core\node> {
 
   <<__Override>>
   protected function renderHTMLBlock(Blocks\HTMLBlock $node): XHP\Core\node {
-    return $node->getCode()."\n" |> _Private\DO_NOT_ESCAPE($$);
+    return _Private\DO_NOT_ESCAPE($node->getCode()."\n");
   }
 
   <<__Override>>
@@ -337,12 +332,12 @@ class HTMLXHPRenderer extends Renderer<XHP\Core\node> {
 
   <<__Override>>
   protected function renderAutoLink(Inlines\AutoLink $node): XHP\Core\node {
-    $href = self::escapeURIAttribute($node->getDestination());
-    $text = self::escapeContent($node->getText());
-    $noFollowUgcTag =
-      $this->getContext()->areLinksNoFollowUGC() ? ' rel="nofollow ugc"' : '';
-    return '<a href="'.$href.'"'.$noFollowUgcTag.'>'.$text.'</a>'
-      |> _Private\DO_NOT_ESCAPE($$);
+    // @see escapeURIAttribute for why we need to evade xhp's attribute escaping here.
+    $href = self::escapeURIAttribute($node->getDestination())
+      |> _Private\DO_NOT_ESCAPE_ATTRIBUTE($$);
+    $rel = $this->getContext()->areLinksNoFollowUGC() ? 'nofollow ugc' : null;
+
+    return <a href={$href} rel={$rel}>{$node->getText()}</a>;
   }
 
   <<__Override>>
@@ -384,19 +379,17 @@ class HTMLXHPRenderer extends Renderer<XHP\Core\node> {
   <<__Override>>
   protected function renderLink(Inlines\Link $node): XHP\Core\node {
     $title = $node->getTitle();
-    if ($title !== null) {
-      $title = ' title="'.self::escapeAttribute($title).'"';
-    }
-    $href = self::escapeURIAttribute($node->getDestination());
+    $rel = $this->getContext()->areLinksNoFollowUGC() ? 'nofollow ugc' : null;
+
+    // @see escapeURIAttribute for why we need to evade xhp's attribute escaping here.
+    $href = self::escapeURIAttribute($node->getDestination())
+      |> _Private\DO_NOT_ESCAPE_ATTRIBUTE($$);
+
     $text = $node->getText()
       |> Vec\map($$, $child ==> $this->render($child))
-      |> _Private\xhp_join($$)
-      |> _Private\FORCE_RENDER($$);
-    $noFollowUgcTag =
-      $this->getContext()->areLinksNoFollowUGC() ? ' rel="nofollow ugc"' : '';
-    return
-      '<a href="'.$href.'"'.$noFollowUgcTag.''.($title ?? '').'>'.$text.'</a>'
-      |> _Private\DO_NOT_ESCAPE($$);
+      |> _Private\xhp_join($$);
+
+    return <a href={$href} rel={$rel} title={$title}>{$text}</a>;
   }
 
   <<__Override>>
