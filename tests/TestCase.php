@@ -15,6 +15,10 @@ use function Facebook\FBExpect\expect;
 
 abstract class TestCase extends \Facebook\HackTest\HackTest {
   const string TAB_REPLACEMENT = "\u{2192}";
+  const dict<string, string> BOOLEAN_ATTRIBUTE_REPLACEMENTS = dict[
+    ' checked ' => ' checked="" ',
+    ' disabled ' => ' disabled="" ',
+  ];
 
   final protected function assertExampleMatches(
     string $name,
@@ -33,7 +37,8 @@ abstract class TestCase extends \Facebook\HackTest\HackTest {
     }
 
     $ast = parse($parser_ctx, $in);
-    $actual_html = (new HTMLRenderer($render_ctx))->render($ast);
+    $actual_html = (new HTMLRenderer($render_ctx))->render($ast)
+      |> self::addEmptyStringsForBooleanAttributes($$);
 
     // Improve output readability
     $actual_html = Str\replace($actual_html, "\t", self::TAB_REPLACEMENT);
@@ -45,5 +50,11 @@ abstract class TestCase extends \Facebook\HackTest\HackTest {
       $name,
       $in,
     );
+  }
+
+  private static function addEmptyStringsForBooleanAttributes(
+    string $html,
+  )[]: string {
+    return Str\replace_every($html, static::BOOLEAN_ATTRIBUTE_REPLACEMENTS);
   }
 }
