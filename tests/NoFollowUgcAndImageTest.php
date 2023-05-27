@@ -45,10 +45,10 @@ final class NoFollowUgcAndImageTest extends TestCase {
 
       // Improve output readability
       $actual_html = Str\replace($actual_html, "\t", self::TAB_REPLACEMENT);
-      $expected_html = Str\replace($expected_html, "\t", self::TAB_REPLACEMENT);
+      $normalized_expected_html = Str\replace($expected_html, "\t", self::TAB_REPLACEMENT);
 
       expect($actual_html)->toBeSame(
-        $expected_html,
+        $normalized_expected_html,
         "HTML differs for %s:\n%s",
         $name,
         $in,

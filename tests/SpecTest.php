@@ -116,10 +116,10 @@ final class SpecTest extends TestCase {
       );
 
       $actual_html = self::normalizeHTML($actual_html);
-      $expected_html = self::normalizeHTML($expected_html);
+      $normalized_expected_html = self::normalizeHTML($expected_html);
 
       expect($actual_html)->toBeSame(
-        $expected_html,
+        $normalized_expected_html,
         "HTML differs for %s:\n%s",
         $name,
         $original_md,
