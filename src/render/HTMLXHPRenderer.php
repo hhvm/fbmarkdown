@@ -11,10 +11,12 @@
 namespace Facebook\Markdown;
 
 use namespace HH\Lib\{C, Str, Vec};
+use namespace Facebook\XHP;
+use type Facebook\XHP\Core\frag;
 
-class HTMLXHPRenderer extends Renderer<string> {
+class HTMLXHPRenderer extends Renderer<XHP\Core\node> {
   const keyset<classname<RenderFilter>> EXTENSIONS = keyset[
-    TagFilterExtension::class, 
+    TagFilterExtension::class,
   ];
 
   protected static function escapeContent(string $text): string {
@@ -57,19 +59,17 @@ class HTMLXHPRenderer extends Renderer<string> {
   }
 
   <<__Override>>
-  protected function renderNodes(vec<ASTNode> $nodes): string {
-    return 'FAILING_TEST_ON_PURPOSE_TO_ENSURE_THIS_IS_COVERED';
+  protected function renderNodes(vec<ASTNode> $nodes): XHP\Core\node {
     return $nodes
       |> Vec\map($$, $node ==> $this->render($node))
       |> Vec\filter($$, $line ==> $line !== '')
-      |> Str\join($$, '');
+      |> _Private\xhp_join($$);
   }
 
   <<__Override>>
-  protected function renderResolvedNode(ASTNode $node): string {
+  protected function renderResolvedNode(ASTNode $node): XHP\Core\node {
     if ($node is RenderableAsXHP) {
-      return $node->renderAsXHP($this->getContext(), $this)
-        |> _Private\FORCE_RENDER($$);
+      return $node->renderAsXHP($this->getContext(), $this);
     }
 
     // This interface is implemented by users of this library.
@@ -77,26 +77,29 @@ class HTMLXHPRenderer extends Renderer<string> {
     // Ideally users would switch over to RenderableAsXHP.
     if ($node is RenderableAsHTML) {
       $string_renderer = new HTMLRenderer($this->getContext());
-      return $node->renderAsHTML($this->getContext(), $string_renderer);
+      return $node->renderAsHTML($this->getContext(), $string_renderer)
+        |> _Private\DO_NOT_ESCAPE($$);
     }
 
     return parent::renderResolvedNode($node);
   }
 
   <<__Override>>
-  protected function renderBlankLine(): string {
-    return '';
+  protected function renderBlankLine(): XHP\Core\node {
+    return <frag />;
   }
 
   <<__Override>>
-  protected function renderBlockQuote(Blocks\BlockQuote $node): string {
+  protected function renderBlockQuote(Blocks\BlockQuote $node): XHP\Core\node {
     return $node->getChildren()
       |> $this->renderNodes($$)
-      |> "<blockquote>\n".$$."</blockquote>\n";
+      |> _Private\FORCE_RENDER($$)
+      |> "<blockquote>\n".$$."</blockquote>\n"
+      |> _Private\DO_NOT_ESCAPE($$);
   }
 
   <<__Override>>
-  protected function renderCodeBlock(Blocks\CodeBlock $node): string {
+  protected function renderCodeBlock(Blocks\CodeBlock $node): XHP\Core\node {
     $extra = '';
     $info = $node->getInfoString();
     if ($info !== null) {
@@ -107,27 +110,30 @@ class HTMLXHPRenderer extends Renderer<string> {
     if ($code !== '') {
       $code = self::escapeContent($code)."\n";
     }
-    return '<pre><code'.$extra.'>'.$code."</code></pre>\n";
+    return '<pre><code'.$extra.'>'.$code."</code></pre>\n"
+      |> _Private\DO_NOT_ESCAPE($$);
   }
 
   <<__Override>>
-  protected function renderHeading(Blocks\Heading $node): string {
+  protected function renderHeading(Blocks\Heading $node): XHP\Core\node {
     $level = $node->getLevel();
     return $node->getHeading()
       |> $this->renderNodes($$)
-      |> \sprintf("<h%d>%s</h%d>\n", $level, $$, $level);
+      |> _Private\FORCE_RENDER($$)
+      |> \sprintf("<h%d>%s</h%d>\n", $level, $$, $level)
+      |> _Private\DO_NOT_ESCAPE($$);
   }
 
   <<__Override>>
-  protected function renderHTMLBlock(Blocks\HTMLBlock $node): string {
-    return $node->getCode()."\n";
+  protected function renderHTMLBlock(Blocks\HTMLBlock $node): XHP\Core\node {
+    return $node->getCode()."\n" |> _Private\DO_NOT_ESCAPE($$);
   }
 
   <<__Override>>
   protected function renderLinkReferenceDefinition(
     Blocks\LinkReferenceDefinition $_def,
-  ): string {
-    return '';
+  ): XHP\Core\node {
+    return <frag />;
   }
 
   protected function renderTaskListItemExtension(
@@ -181,24 +187,30 @@ class HTMLXHPRenderer extends Renderer<string> {
               return $this->renderNodes($child->getContents());
             }
             if ($child is Blocks\Block) {
-              return Str\trim($this->render($child));
+              return $this->render($child)
+                |> _Private\FORCE_RENDER($$)
+                |> Str\trim($$)
+                |> _Private\DO_NOT_ESCAPE($$);
             }
             return $this->render($child);
           },
         )
-        |> Str\join($$, "\n");
+        |> _Private\xhp_join($$, () ==> "\n")
+        |> _Private\FORCE_RENDER($$);
       if (!C\last($children) is Blocks\Paragraph) {
         $content .= "\n";
       }
     } else {
-      $content = "\n".$this->renderNodes($children);
+      $content = "\n"._Private\FORCE_RENDER($this->renderNodes($children));
     }
 
     return '<li>'.$content."</li>\n";
   }
 
   <<__Override>>
-  protected function renderListOfItems(Blocks\ListOfItems $node): string {
+  protected function renderListOfItems(
+    Blocks\ListOfItems $node,
+  ): XHP\Core\node {
     $start = $node->getFirstNumber();
     if ($start === null) {
       $start = '<ul>';
@@ -213,21 +225,27 @@ class HTMLXHPRenderer extends Renderer<string> {
     return $node->getItems()
       |> Vec\map($$, $item ==> $this->renderListItem($node, $item))
       |> Str\join($$, '')
-      |> $start."\n".$$.$end."\n";
+      |> $start."\n".$$.$end."\n"
+      |> _Private\DO_NOT_ESCAPE($$);
   }
 
   <<__Override>>
-  protected function renderParagraph(Blocks\Paragraph $node): string {
-    return '<p>'.$this->renderNodes($node->getContents())."</p>\n";
+  protected function renderParagraph(Blocks\Paragraph $node): XHP\Core\node {
+    return '<p>'.
+      _Private\FORCE_RENDER($this->renderNodes($node->getContents())).
+      "</p>\n"
+      |> _Private\DO_NOT_ESCAPE($$);
   }
 
   <<__Override>>
-  protected function renderTableExtension(Blocks\TableExtension $node): string {
+  protected function renderTableExtension(
+    Blocks\TableExtension $node,
+  ): XHP\Core\node {
     $html = "<table>\n".$this->renderTableHeader($node);
 
     $data = $node->getData();
     if (C\is_empty($data)) {
-      return $html."</table>\n";
+      return $html."</table>\n" |> _Private\DO_NOT_ESCAPE($$);
     }
     $html .= "\n<tbody>";
 
@@ -236,7 +254,7 @@ class HTMLXHPRenderer extends Renderer<string> {
       ++$row_idx;
       $html .= "\n".$this->renderTableDataRow($node, $row_idx, $row);
     }
-    return $html."</tbody></table>\n";
+    return $html."</tbody></table>\n" |> _Private\DO_NOT_ESCAPE($$);
   }
 
   protected function renderTableHeader(Blocks\TableExtension $node): string {
@@ -250,7 +268,11 @@ class HTMLXHPRenderer extends Renderer<string> {
       if ($alignment !== null) {
         $alignment = ' align="'.$alignment.'"';
       }
-      $html .= '<th'.($alignment ?? '').'>'.$this->renderNodes($cell)."</th>\n";
+      $html .= '<th'.
+        ($alignment ?? '').
+        '>'.
+        _Private\FORCE_RENDER($this->renderNodes($cell)).
+        "</th>\n";
     }
     $html .= "</tr>\n</thead>";
     return $html;
@@ -265,7 +287,10 @@ class HTMLXHPRenderer extends Renderer<string> {
     for ($i = 0; $i < C\count($row); ++$i) {
       $cell = $row[$i];
 
-      $html .= "\n".$this->renderTableDataCell($table, $row_idx, $i, $cell);
+      $html .= "\n".
+        _Private\FORCE_RENDER(
+          $this->renderTableDataCell($table, $row_idx, $i, $cell),
+        );
     }
     $html .= "\n</tr>";
     return $html;
@@ -276,56 +301,65 @@ class HTMLXHPRenderer extends Renderer<string> {
     int $_row_idx,
     int $col_idx,
     Blocks\TableExtension::TCell $cell,
-  ): string {
+  ): XHP\Core\node {
     $alignment = $table->getColumnAlignments()[$col_idx];
     if ($alignment !== null) {
       $alignment = ' align="'.$alignment.'"';
     }
-    return '<td'.($alignment ?? '').'>'.$this->renderNodes($cell).'</td>';
+    return '<td'.
+      ($alignment ?? '').
+      '>'.
+      _Private\FORCE_RENDER($this->renderNodes($cell)).
+      '</td>'
+      |> _Private\DO_NOT_ESCAPE($$);
   }
 
   <<__Override>>
-  protected function renderThematicBreak(): string {
-    return "<hr />\n";
+  protected function renderThematicBreak(): XHP\Core\node {
+    return "<hr />\n" |> _Private\DO_NOT_ESCAPE($$);
   }
 
   <<__Override>>
-  protected function renderAutoLink(Inlines\AutoLink $node): string {
+  protected function renderAutoLink(Inlines\AutoLink $node): XHP\Core\node {
     $href = self::escapeURIAttribute($node->getDestination());
     $text = self::escapeContent($node->getText());
     $noFollowUgcTag =
       $this->getContext()->areLinksNoFollowUGC() ? ' rel="nofollow ugc"' : '';
-    return '<a href="'.$href.'"'.$noFollowUgcTag.'>'.$text.'</a>';
+    return '<a href="'.$href.'"'.$noFollowUgcTag.'>'.$text.'</a>'
+      |> _Private\DO_NOT_ESCAPE($$);
   }
 
   <<__Override>>
   protected function renderInlineWithPlainTextContent(
     Inlines\InlineWithPlainTextContent $node,
-  ): string {
-    return self::escapeContent($node->getContent());
+  ): XHP\Core\node {
+    return
+      self::escapeContent($node->getContent()) |> _Private\DO_NOT_ESCAPE($$);
   }
 
   <<__Override>>
-  protected function renderCodeSpan(Inlines\CodeSpan $node): string {
-    return '<code>'.self::escapeContent($node->getCode()).'</code>';
+  protected function renderCodeSpan(Inlines\CodeSpan $node): XHP\Core\node {
+    return '<code>'.self::escapeContent($node->getCode()).'</code>'
+      |> _Private\DO_NOT_ESCAPE($$);
   }
 
   <<__Override>>
-  protected function renderEmphasis(Inlines\Emphasis $node): string {
+  protected function renderEmphasis(Inlines\Emphasis $node): XHP\Core\node {
     $tag = $node->isStrong() ? 'strong' : 'em';
     return $node->getContent()
-      |> Vec\map($$, $item ==> $this->render($item))
+      |> Vec\map($$, $item ==> _Private\FORCE_RENDER($this->render($item)))
       |> Str\join($$, '')
-      |> '<'.$tag.'>'.$$.'</'.$tag.'>';
+      |> '<'.$tag.'>'.$$.'</'.$tag.'>'
+      |> _Private\DO_NOT_ESCAPE($$);
   }
 
   <<__Override>>
-  protected function renderHardLineBreak(): string {
-    return "<br />\n";
+  protected function renderHardLineBreak(): XHP\Core\node {
+    return "<br />\n" |> _Private\DO_NOT_ESCAPE($$);
   }
 
   <<__Override>>
-  protected function renderImage(Inlines\Image $node): string {
+  protected function renderImage(Inlines\Image $node): XHP\Core\node {
     $title = $node->getTitle();
     if ($title !== null) {
       $title = ' title="'.self::escapeAttribute($title).'"';
@@ -336,11 +370,12 @@ class HTMLXHPRenderer extends Renderer<string> {
       |> Str\join($$, '');
     // Needs to always be present for spec tests to pass
     $alt = ' alt="'.self::escapeAttribute($text).'"';
-    return '<img src="'.$src.'"'.$alt.($title ?? '').' />';
+    return '<img src="'.$src.'"'.$alt.($title ?? '').' />'
+      |> _Private\DO_NOT_ESCAPE($$);
   }
 
   <<__Override>>
-  protected function renderLink(Inlines\Link $node): string {
+  protected function renderLink(Inlines\Link $node): XHP\Core\node {
     $title = $node->getTitle();
     if ($title !== null) {
       $title = ' title="'.self::escapeAttribute($title).'"';
@@ -348,30 +383,33 @@ class HTMLXHPRenderer extends Renderer<string> {
     $href = self::escapeURIAttribute($node->getDestination());
     $text = $node->getText()
       |> Vec\map($$, $child ==> $this->render($child))
-      |> Str\join($$, '');
+      |> _Private\xhp_join($$)
+      |> _Private\FORCE_RENDER($$);
     $noFollowUgcTag =
       $this->getContext()->areLinksNoFollowUGC() ? ' rel="nofollow ugc"' : '';
     return
-      '<a href="'.$href.'"'.$noFollowUgcTag.''.($title ?? '').'>'.$text.'</a>';
+      '<a href="'.$href.'"'.$noFollowUgcTag.''.($title ?? '').'>'.$text.'</a>'
+      |> _Private\DO_NOT_ESCAPE($$);
   }
 
   <<__Override>>
-  protected function renderRawHTML(Inlines\RawHTML $node): string {
-    return $node->getContent();
+  protected function renderRawHTML(Inlines\RawHTML $node): XHP\Core\node {
+    return $node->getContent() |> _Private\DO_NOT_ESCAPE($$);
   }
 
   <<__Override>>
-  protected function renderSoftLineBreak(): string {
-    return "\n";
+  protected function renderSoftLineBreak(): XHP\Core\node {
+    return "\n" |> _Private\DO_NOT_ESCAPE($$);
   }
 
   <<__Override>>
   protected function renderStrikethroughExtension(
     Inlines\StrikethroughExtension $node,
-  ): string {
+  ): XHP\Core\node {
     $children = $node->getChildren()
       |> Vec\map($$, $child ==> $this->render($child))
-      |> Str\join($$, '');
-    return '<del>'.$children.'</del>';
+      |> _Private\xhp_join($$)
+      |> _Private\FORCE_RENDER($$);
+    return '<del>'.$children.'</del>' |> _Private\DO_NOT_ESCAPE($$);
   }
 }

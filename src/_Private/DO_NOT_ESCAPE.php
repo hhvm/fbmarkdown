@@ -11,13 +11,14 @@
 namespace Facebook\Markdown\_Private;
 
 use namespace Facebook\XHP;
+use type Facebook\XHP\Core\frag;
 
 /**
  * @see https://codebeforethehorse.tumblr.com/post/87306947716/converting-a-project-to-xhp
  */
 // HHAST_IGNORE_ERROR[CamelCasedMethodsUnderscoredFunctions] intentionally SHOUT_CASE
-function DO_NOT_ESCAPE(string $danger_danger_danger): DO_NOT_ESCAPE {
-  return new DO_NOT_ESCAPE($danger_danger_danger);
+function DO_NOT_ESCAPE(string $danger_danger_danger): frag {
+  return <frag>{new DO_NOT_ESCAPE($danger_danger_danger)}</frag>;
 }
 
 final class DO_NOT_ESCAPE implements XHP\UnsafeRenderable {
