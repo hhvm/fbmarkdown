@@ -18,13 +18,13 @@ use namespace HH\Lib\Vec;
 final class InlineSequenceBlock extends LeafBlock {
   private vec<Inlines\Inline> $children;
 
-  final public function __construct(
+  public function __construct(
     vec<?Inlines\Inline> $children,
   ) {
     $this->children = Vec\filter_nulls($children);
   }
 
-  final public static function flatten(?Inlines\Inline ...$children): this {
+  public static function flatten(?Inlines\Inline ...$children): this {
     return new self(vec($children));
   }
 
