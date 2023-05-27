@@ -105,7 +105,7 @@ class HTMLXHPRenderer extends Renderer<XHP\Core\node> {
     if ($node is RenderableAsHTML) {
       $string_renderer = new HTMLRenderer($this->getContext());
       return $node->renderAsHTML($this->getContext(), $string_renderer)
-        |> _Private\DO_NOT_ESCAPE($$);
+        |> _Private\EMBED_THIS_STRING_AS_IS_WITHOUT_ESCAPING_OR_FILTERING($$);
     }
 
     return parent::renderResolvedNode($node);
@@ -153,7 +153,8 @@ class HTMLXHPRenderer extends Renderer<XHP\Core\node> {
 
   <<__Override>>
   protected function renderHTMLBlock(Blocks\HTMLBlock $node): XHP\Core\node {
-    return _Private\DO_NOT_ESCAPE($node->getCode()."\n");
+    return $node->getCode()."\n"
+      |> _Private\EMBED_THIS_STRING_AS_IS_WITHOUT_ESCAPING_OR_FILTERING($$);
   }
 
   <<__Override>>
@@ -407,7 +408,8 @@ class HTMLXHPRenderer extends Renderer<XHP\Core\node> {
 
   <<__Override>>
   protected function renderRawHTML(Inlines\RawHTML $node): XHP\Core\node {
-    return _Private\DO_NOT_ESCAPE($node->getContent());
+    return $node->getContent()
+      |> _Private\EMBED_THIS_STRING_AS_IS_WITHOUT_ESCAPING_OR_FILTERING($$);
   }
 
   <<__Override>>

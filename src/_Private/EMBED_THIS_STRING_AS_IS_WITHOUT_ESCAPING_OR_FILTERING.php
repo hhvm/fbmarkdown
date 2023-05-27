@@ -17,11 +17,13 @@ use type Facebook\XHP\Core\frag;
  * @see https://codebeforethehorse.tumblr.com/post/87306947716/converting-a-project-to-xhp
  */
 // HHAST_IGNORE_ERROR[CamelCasedMethodsUnderscoredFunctions] intentionally SHOUT_CASE
-function DO_NOT_ESCAPE(string $danger_danger_danger): frag {
-  return <frag>{new DO_NOT_ESCAPE($danger_danger_danger)}</frag>;
+function EMBED_THIS_STRING_AS_IS_WITHOUT_ESCAPING_OR_FILTERING(
+  string $danger_danger_danger,
+): frag {
+  return <frag>{new POTENTIAL_XSS_HOLE($danger_danger_danger)}</frag>;
 }
 
-final class DO_NOT_ESCAPE implements XHP\UnsafeRenderable {
+final class POTENTIAL_XSS_HOLE implements XHP\UnsafeRenderable {
   public function __construct(private string $dangerDangerDanger) {}
 
   public async function toHTMLStringAsync(): Awaitable<string> {
