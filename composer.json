@@ -11,7 +11,8 @@
     },
     "require": {
         "hhvm": "^4.128",
-        "hhvm/type-assert": "^3.1|^4.0"
+        "hhvm/type-assert": "^3.1|^4.0",
+        "facebook/xhp-lib": "^4.1"
     },
     "require-dev": {
         "hhvm/hacktest": "^2.0",
