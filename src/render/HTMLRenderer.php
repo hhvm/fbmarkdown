@@ -36,6 +36,18 @@ class HTMLRenderer extends Renderer<string> {
     return _Private\plain_text_to_html_attribute($text);
   }
 
+  // This is the list from the reference implementation
+  // Unused, but kept for backwards compatibility.
+  //hackfmt-ignore
+  const keyset<string> URI_SAFE = keyset[
+    '-', '_', '.', '+', '!', '*', "'", '(', ')', ';', ':', '%', '#', '@', '?',
+    '=', ';', ':', '/', ',', '+', '&', '$',
+    'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
+    'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
+    'u', 'v', 'w', 'x', 'y', 'z',
+    '1', '2', '3', '4', '5', '6', '7', '8', '9', '0',
+  ];
+
   protected static function escapeURIAttribute(string $text): string {
     return _Private\escape_uri_attribute($text)->toHTMLString();
   }
