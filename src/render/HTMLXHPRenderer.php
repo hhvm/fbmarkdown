@@ -26,6 +26,7 @@ use type Facebook\XHP\HTML\{
   h5,
   h6,
   hr,
+  img,
   p,
   strong,
 };
@@ -372,17 +373,12 @@ class HTMLXHPRenderer extends Renderer<XHP\Core\node> {
   <<__Override>>
   protected function renderImage(Inlines\Image $node): XHP\Core\node {
     $title = $node->getTitle();
-    if ($title !== null) {
-      $title = ' title="'.self::escapeAttribute($title).'"';
-    }
     $src = self::escapeURIAttribute($node->getSource());
-    $text = $node->getDescription()
+    // Needs to always be present for spec tests to pass
+    $alt = $node->getDescription()
       |> Vec\map($$, $child ==> $child->getContentAsPlainText())
       |> Str\join($$, '');
-    // Needs to always be present for spec tests to pass
-    $alt = ' alt="'.self::escapeAttribute($text).'"';
-    return '<img src="'.$src.'"'.$alt.($title ?? '').' />'
-      |> _Private\DO_NOT_ESCAPE($$);
+    return <img src={$src} alt={$alt} title={$title} />;
   }
 
   <<__Override>>

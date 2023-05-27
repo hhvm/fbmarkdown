@@ -10,7 +10,7 @@
 
 namespace Facebook\Markdown;
 
-use namespace HH\Lib\Str;
+use namespace HH\Lib\{Regex, Str};
 use function Facebook\FBExpect\expect;
 use namespace Facebook\XHP;
 use type XHPChild;
@@ -105,6 +105,26 @@ abstract class TestCase extends \Facebook\HackTest\HackTest {
   }
 
   private static function correctForSpecDeviations(string $html)[]: string {
-    return Str\replace_every($html, static::SLIGHT_DEVIATIONS_FROM_SPEC);
+    return Str\replace_every($html, static::SLIGHT_DEVIATIONS_FROM_SPEC)
+      |> self::placeASolidusBeforeTheEndOfTheClosingImgTags($$);
+  }
+
+  private static function placeASolidusBeforeTheEndOfTheClosingImgTags(
+    string $html,
+  )[]: string {
+    // https://stackoverflow.com/posts/1732454/revisions
+    // #pragma enable module(guard(superstition))
+    return Regex\replace_with($html, re'#<img .+?>#', $he_comes ==> {
+      $the_pony = $he_comes[0];
+
+      if ($the_pony[Str\length($the_pony) - 2] === '/') {
+        return $the_pony;
+      }
+
+      $the_pony[Str\length($the_pony) - 1] = ' ';
+      $the_pony .= '/>';
+      return $the_pony;
+    });
+    // #endpragma
   }
 }
