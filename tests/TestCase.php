@@ -37,6 +37,7 @@ abstract class TestCase extends \Facebook\HackTest\HackTest {
     return vec[
       tuple(($ctx)[defaults] ==> new HTMLRenderer($ctx)),
       tuple(($ctx)[defaults] ==> new HTMLXHPRenderer($ctx)),
+      tuple(($ctx)[defaults] ==> new HTMLWithXHPInternallyRenderer($ctx)),
     ];
   }
 

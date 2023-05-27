@@ -13,6 +13,16 @@ namespace Facebook\Markdown;
 use namespace HH\Lib\{C, Str, Vec};
 use namespace HH\Asio;
 
+/**
+ * You probably want to use `HTMLXHPRenderer` or failing that
+ * `HTMLWithXHPInternallyRenderer`. These two renderers are built with xhp,
+ * which automates the escaping of attributes and text nodes.
+ *
+ * `HTMLRenderer` uses string concatenation and manual escaping under the hood.
+ * Great care is taken to escape user data, but when this is done manually,
+ * bugs can slip through. Strongly consider the other renderers in security
+ * critical contexts.
+ */
 class HTMLRenderer extends Renderer<string> {
   const keyset<classname<RenderFilter>> EXTENSIONS = keyset[
     TagFilterExtension::class,
