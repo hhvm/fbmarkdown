@@ -10,7 +10,6 @@
 
 namespace Facebook\Markdown\Blocks;
 
-
 abstract class ContainerBlock extends Block {
   public function __construct(
     protected vec<Block> $children,

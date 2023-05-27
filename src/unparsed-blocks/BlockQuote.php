@@ -46,7 +46,6 @@ class BlockQuote extends ContainerBlock<Block> implements BlockProducer {
       $parsed = null;
     }
 
-
     if (C\is_empty($contents)) {
       return null;
     }

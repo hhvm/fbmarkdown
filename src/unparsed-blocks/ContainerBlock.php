@@ -12,7 +12,6 @@ namespace Facebook\Markdown\UnparsedBlocks;
 
 use namespace HH\Lib\Vec;
 
-
 abstract class ContainerBlock<TChild as Block>
 extends Block {
   public function __construct(
