@@ -111,9 +111,11 @@ final class SpecTest extends TestCase {
     $normalized_md = (new MarkdownRenderer($render_ctx))->render($ast);
     $normalized_ast = parse($parser_ctx, $normalized_md);
     foreach ($this->provideHTMLRendererConstructors() as list($constructor)) {
-      $actual_html = await static::unsafeStringifyXHPChildAsync(
-        $constructor($render_ctx)->render($normalized_ast),
-      );
+      using (_Private\disable_child_validation()) {
+        $actual_html = await static::unsafeStringifyXHPChildAsync(
+          $constructor($render_ctx)->render($normalized_ast),
+        );
+      }
 
       $actual_html = self::normalizeHTML($actual_html);
       $normalized_expected_html = self::normalizeHTML($expected_html);

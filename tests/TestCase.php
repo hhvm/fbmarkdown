@@ -85,11 +85,12 @@ abstract class TestCase extends \Facebook\HackTest\HackTest {
 
     $ast = parse($parser_ctx, $in);
     foreach ($this->provideHTMLRendererConstructors() as list($constructor)) {
-      $actual_html = await static::unsafeStringifyXHPChildAsync(
-        $constructor($render_ctx)->render($ast),
-      )
-        |> self::correctForSpecDeviations($$);
-
+      using (_Private\disable_child_validation()) {
+        $actual_html = await static::unsafeStringifyXHPChildAsync(
+          $constructor($render_ctx)->render($ast),
+        )
+          |> self::correctForSpecDeviations($$);
+      }
       // Improve output readability
       $actual_html = Str\replace($actual_html, "\t", self::TAB_REPLACEMENT);
       $normalized_expected_html =

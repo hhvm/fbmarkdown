@@ -28,11 +28,14 @@ use type Facebook\XHP\HTML\{
   h6,
   hr,
   img,
+  li,
+  ol,
   p,
   pre,
   strong,
+  ul,
 };
-use type Facebook\Markdown\_Private\td_with_align;
+use type Facebook\Markdown\_Private\{td_with_align, trim_node};
 
 class HTMLXHPRenderer extends Renderer<XHP\Core\node> {
   const keyset<classname<RenderFilter>> EXTENSIONS = keyset[
@@ -159,7 +162,7 @@ class HTMLXHPRenderer extends Renderer<XHP\Core\node> {
   protected function renderTaskListItemExtension(
     Blocks\ListOfItems $list,
     Blocks\TaskListItemExtension $item,
-  ): string {
+  ): XHP\Core\node {
     $checked = $item->isChecked() ? ' checked=""' : '';
     $checkbox = '<input'.$checked.' disabled="" type="checkbox"> ';
 
@@ -182,71 +185,63 @@ class HTMLXHPRenderer extends Renderer<XHP\Core\node> {
   protected function renderListItem(
     Blocks\ListOfItems $list,
     Blocks\ListItem $item,
-  ): string {
+  ): XHP\Core\node {
     if ($item is Blocks\TaskListItemExtension) {
       return $this->renderTaskListItemExtension($list, $item);
     }
 
     $children = $item->getChildren();
     if (C\is_empty($children)) {
-      return "<li></li>\n";
+      return <frag><li></li>{"\n"}</frag>;
+    }
+
+    if ($list->isLoose()) {
+      return <frag><li>{"\n"}{$this->renderNodes($children)}</li>{"\n"}</frag>;
     }
 
     $content = '';
 
-    if ($list->isTight()) {
-      if (!C\first($children) is Blocks\Paragraph) {
-        $content .= "\n";
-      }
-
-      $content .= $children
-        |> Vec\map(
-          $$,
-          $child ==> {
-            if ($child is Blocks\Paragraph) {
-              return $this->renderNodes($child->getContents());
-            }
-            if ($child is Blocks\Block) {
-              return $this->render($child)
-                |> _Private\FORCE_RENDER($$)
-                |> Str\trim($$)
-                |> _Private\DO_NOT_ESCAPE($$);
-            }
-            return $this->render($child);
-          },
-        )
-        |> _Private\xhp_join($$, () ==> "\n")
-        |> _Private\FORCE_RENDER($$);
-      if (!C\last($children) is Blocks\Paragraph) {
-        $content .= "\n";
-      }
-    } else {
-      $content = "\n"._Private\FORCE_RENDER($this->renderNodes($children));
-    }
-
-    return '<li>'.$content."</li>\n";
+    return
+      <frag>
+        <li>
+          {C\firstx($children) is Blocks\Paragraph ? null : "\n"}
+          {
+            Vec\map(
+              $children,
+              $child ==> {
+                if ($child is Blocks\Paragraph) {
+                  return $this->renderNodes($child->getContents());
+                }
+                if ($child is Blocks\Block) {
+                  return <trim_node>{$this->render($child)}</trim_node>;
+                }
+                return $this->render($child);
+              },
+            )
+            |> _Private\xhp_join($$, () ==> "\n")
+          }
+          {C\lastx($children) is Blocks\Paragraph ? null : "\n"}
+        </li>
+        {"\n"}
+      </frag>;
   }
 
   <<__Override>>
   protected function renderListOfItems(
     Blocks\ListOfItems $node,
   ): XHP\Core\node {
+    $children =
+      Vec\map($node->getItems(), $item ==> $this->renderListItem($node, $item));
+
     $start = $node->getFirstNumber();
-    if ($start === null) {
-      $start = '<ul>';
-      $end = '</ul>';
-    } else if ($start === 1) {
-      $start = '<ol>';
-      $end = '</ol>';
-    } else {
-      $start = \sprintf('<ol start="%d">', $start);
-      $end = '</ol>';
+    switch ($start) {
+      case null:
+        return <frag><ul>{"\n"}{$children}</ul>{"\n"}</frag>;
+      case 1:
+        return <frag><ol>{"\n"}{$children}</ol>{"\n"}</frag>;
+      default:
+        return <frag><ol start={$start}>{"\n"}{$children}</ol>{"\n"}</frag>;
     }
-    return $node->getItems()
-      |> Vec\map($$, $item ==> $this->renderListItem($node, $item))
-      |> Str\join($$, '')
-      |> $start."\n".$$.$end."\n"
-      |> _Private\DO_NOT_ESCAPE($$);
   }
 
   <<__Override>>
