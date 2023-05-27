@@ -20,11 +20,6 @@ Originally, the Ruby GFM pipeline was the best fit; over time, we started to wan
 
 FBMarkdown exists to address all of these goals.
 
-## Requirements
-
-- HHVM 3.24 or above.
-- [hhvm-autoload](https://github.com/hhvm/hhvm-autoload)
-
 ## Installing FBMarkdown
 
     hhvm composer.phar require facebook/fbmarkdown
